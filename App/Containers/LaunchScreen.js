@@ -2,11 +2,19 @@ import React, { Component } from 'react'
 import { ScrollView, Text, Image, View } from 'react-native'
 import { Images } from '../Themes'
 
+import { connect } from 'react-redux'
+import CoinsActions from '../Redux/CoinsRedux'
+
 // Styles
 import styles from './Styles/LaunchScreenStyles'
 
-export default class LaunchScreen extends Component {
+class LaunchScreen extends Component {
+  componentDidMount () {
+    this.props.coinsRequest("USD", "24h", null, null, 10, null)
+  }
+
   render () {
+    console.log('coins', this.props.coins)
     return (
       <View style={styles.mainContainer}>
         <Image source={Images.background} style={styles.backgroundImage} resizeMode='stretch' />
@@ -27,3 +35,18 @@ export default class LaunchScreen extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    coins: state.coins
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    coinsRequest: (base, timePeriod, ids, sort, limit, order) => dispatch(CoinsActions.coinsRequest(base, timePeriod, ids, sort, limit, order))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(LaunchScreen)
+
