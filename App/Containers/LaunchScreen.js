@@ -164,7 +164,7 @@ class LaunchScreen extends Component {
               <Text style={{color: colors.silver, textAlign: 'center', fontSize: 14}} >Price</Text>
               <Text style={{color: colors.silver, textAlign: 'center', fontSize: 14}} >Change</Text>
             </View>
-          {graphData && <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center',  marginTop: -20}}>
+          {graphData && <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center',  marginTop: -15}}>
             <Text h3 h3Style={{color: colors.silver, width: '49%', textAlign: 'center', fontSize: 20}} >{coins.payload.data.base.sign + _.ceil(graphData.price, 2)}</Text>
             <View style={{height: 70, width: 1, marginTop: -10, backgroundColor: colors.silver}}/>
             <Text h3 h3Style={{color: colors.silver, width: '49%', textAlign: 'center', fontSize: 20}}>{_.ceil(graphData.change, 2) + '%'}</Text>
@@ -189,11 +189,12 @@ const svgBloack = (data) => {
     return (
       <View style={{paddingTop: 10, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
         <SvgUri
+          style={{flex: 0.5, alignItems: 'center'}}
           width={60}
           height={60}
           source={{ uri: data.iconUrl}}
         />
-        <Text h4 h4Style={{ fontWeight: 'bold', color: colors.silver }} >{data.name}</Text>
+        <Text h4 h4Style={{ fontWeight: 'bold', color: colors.silver, flex: 0.5, textAlign: 'center' }} >{data.name}</Text>
       </View>
     )
     // expected output: ReferenceError: nonExistentFunction is not defined
