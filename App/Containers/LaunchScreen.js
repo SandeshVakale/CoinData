@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
-import { FlatList, View, Dimensions, ActivityIndicator } from 'react-native'
+import { FlatList, View, Dimensions, ActivityIndicator, ScrollView } from 'react-native'
 import { Colors } from '../Themes'
-import { Button, Avatar } from 'react-native-elements'
+import { Button, Text } from 'react-native-elements'
 import { connect } from 'react-redux'
 import CoinsActions from '../Redux/CoinsRedux'
-
-import { SvgCssUri } from 'react-native-svg';
+import SvgUri from 'react-native-svg-uri';
 import _ from 'lodash'
 import {
   LineChart
@@ -16,7 +15,7 @@ import styles from './Styles/LaunchScreenStyles'
 import colors from '../Themes/Colors'
 
 const timePeriods = [
-  '24h','7d','30d'
+  '24h','7d','30d', '1y', '5y'
 ]
 
 // const hours = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ]
@@ -42,7 +41,7 @@ class LaunchScreen extends Component {
   componentDidMount () {
     const {base, timePeriod} = this.state
     const {coinsRequest} = this.props
-    coinsRequest(base, timePeriod, null, null, 7, null)
+    coinsRequest(base, timePeriod, null, null, 10, null)
   }
 
 
@@ -51,7 +50,7 @@ class LaunchScreen extends Component {
     const {coinsRequest} = this.props
     this.setState({ timePeriod: item.item, refresh: !refresh })
     console.log('item', item)
-    coinsRequest(base, item.item, null, null, 7, null)
+    coinsRequest(base, item.item, null, null, 10, null)
   }
 
   hotReload = (item) => {
@@ -59,13 +58,13 @@ class LaunchScreen extends Component {
     const {coinsRequest} = this.props
     this.setState({ base: item.item, refresh: !refresh })
     //console.log('item', item)
-    coinsRequest(item.item, timePeriod, null, null, 7, null)
+    coinsRequest(item.item, timePeriod, null, null, 10, null)
   }
 
   componentDidUpdate(prevProps) {
     const {coins} = this.props
     const {active} = this.state
-    if(!_.isEqual(coins, prevProps.coins) && coins.fetching === false) // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
+    if(!_.isEqual(coins, prevProps.coins) && coins.fetching === false)
     {
       this.setState({ graphData: coins.payload.data.coins[active] })
     }
@@ -75,15 +74,15 @@ class LaunchScreen extends Component {
     const {coins} = this.props
     const {graphData, timePeriod, refresh, base} = this.state
     console.log(coins)
-    if (graphData === null && coins.fetching === false)
+    if (graphData === null && coins.fetching === false && coins.payload !== null)
     {
      this.setState({graphData: coins.payload.data.coins[0]})
     }
-
     if (coins.fetching === false) {
       return (
-        <View style={{ backgroundColor: this.state.graphData ? this.state.graphData.color : colors.ember, flex: 1 }}>
-          <View style={{height: 120}}>
+        <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: this.state.graphData && this.state.graphData.color !== null ? this.state.graphData.color : colors.ember, flex: 1 }}>
+          {/*<SafeAreaView />*/}
+          <View >
           <FlatList data={coins.payload.data.coins} horizontal extraData={refresh}
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{ height: 50, borderColor: Colors.coal, marginTop: 50 }}
@@ -105,8 +104,9 @@ class LaunchScreen extends Component {
                 }
               ]
             }}
+            withDots={false}
             width={Dimensions.get("window").width} // from react-native
-            height={300}
+            height={280}
             yAxisLabel={coins.payload.data.base.sign}
             yAxisSuffix={"k"}
             yAxisInterval={1} // optional, defaults to 1
@@ -134,6 +134,7 @@ class LaunchScreen extends Component {
 
           <View style={{height: 100, alignItems: 'center', marginTop: -100}}>
             <FlatList data={timePeriods} horizontal extraData={refresh}
+                      style={{height: 50}}
                       showsHorizontalScrollIndicator={false}
                       contentContainerStyle={{ height: 50, borderColor: Colors.coal, marginTop: 50 }}
                       renderItem={(item) => <Button
@@ -141,7 +142,7 @@ class LaunchScreen extends Component {
                         titleStyle={{ color: colors.silver }}
                         onPress={() => this.reload(item)}
                         buttonStyle={timePeriod === item.item ? styles.active : styles.deactive}
-                        title={item.item}/>
+                        title={(item.item).toUpperCase()}/>
                       }/>
           </View>
 
@@ -159,7 +160,19 @@ class LaunchScreen extends Component {
           </View>
 
           {graphData && svgBloack(graphData)}
-        </View>
+            <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+              <Text style={{color: colors.silver, textAlign: 'center', fontSize: 14}} >Price</Text>
+              <Text style={{color: colors.silver, textAlign: 'center', fontSize: 14}} >Change</Text>
+            </View>
+          {graphData && <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center',  marginTop: -20}}>
+            <Text h3 h3Style={{color: colors.silver, width: '49%', textAlign: 'center', fontSize: 20}} >{coins.payload.data.base.sign + _.ceil(graphData.price, 2)}</Text>
+            <View style={{height: 70, width: 1, marginTop: -10, backgroundColor: colors.silver}}/>
+            <Text h3 h3Style={{color: colors.silver, width: '49%', textAlign: 'center', fontSize: 20}}>{_.ceil(graphData.change, 2) + '%'}</Text>
+          </View>}
+
+          {graphData && Dimensions.get("window").height > 700 && <Text style={{color: colors.silver, fontSize: 18, padding: 15}}>{graphData.description}</Text>}
+          {graphData && <Button buttonStyle={{backgroundColor: colors.silver, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Get Coins Data ->'} titleStyle={{color: graphData.color}}/>}
+        </ScrollView>
       )
     } else {
        return (
@@ -173,30 +186,18 @@ class LaunchScreen extends Component {
 
 
 const svgBloack = (data) => {
-  try {
     return (
-      <View style={{padding: 10}}>
-      <SvgCssUri
-        width={100}
-        height={100}
-        uri={data.iconUrl}
-      />
-      </View>
-    )
-  }
-  catch(error) {
-    return (
-      <View style={{padding: 10}}>
-      <Avatar
-        rounded
-        containerStyle={{height: 100, width: 100}}
-        title="NI"
-      />
+      <View style={{paddingTop: 10, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
+        <SvgUri
+          width={60}
+          height={60}
+          source={{ uri: data.iconUrl}}
+        />
+        <Text h4 h4Style={{ fontWeight: 'bold', color: colors.silver }} >{data.name}</Text>
       </View>
     )
     // expected output: ReferenceError: nonExistentFunction is not defined
     // Note - error messages will vary depending on browser
-  }
 }
 
 const mapStateToProps = (state) => {
