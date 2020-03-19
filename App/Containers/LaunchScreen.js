@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { FlatList, View, Dimensions, ActivityIndicator, ScrollView } from 'react-native'
+import { FlatList, View, Dimensions, ActivityIndicator, ScrollView, Linking } from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../Themes'
 import { Button, Text } from 'react-native-elements'
 import { connect } from 'react-redux'
@@ -41,7 +42,7 @@ class LaunchScreen extends Component {
   componentDidMount () {
     const {base, timePeriod} = this.state
     const {coinsRequest} = this.props
-    coinsRequest(base, timePeriod, null, null, 10, null)
+    coinsRequest(base, timePeriod, null, null, 50, null)
   }
 
 
@@ -50,7 +51,7 @@ class LaunchScreen extends Component {
     const {coinsRequest} = this.props
     this.setState({ timePeriod: item.item, refresh: !refresh })
     console.log('item', item)
-    coinsRequest(base, item.item, null, null, 10, null)
+    coinsRequest(base, item.item, null, null, 50, null)
   }
 
   hotReload = (item) => {
@@ -58,7 +59,7 @@ class LaunchScreen extends Component {
     const {coinsRequest} = this.props
     this.setState({ base: item.item, refresh: !refresh })
     //console.log('item', item)
-    coinsRequest(item.item, timePeriod, null, null, 10, null)
+    coinsRequest(item.item, timePeriod, null, null, 50, null)
   }
 
   componentDidUpdate(prevProps) {
@@ -171,7 +172,14 @@ class LaunchScreen extends Component {
           </View>}
 
           {graphData && Dimensions.get("window").height > 700 && <Text style={{color: colors.silver, fontSize: 18, padding: 15}}>{graphData.description}</Text>}
-          {graphData && <Button buttonStyle={{backgroundColor: colors.silver, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Get Coins Data ->'} titleStyle={{color: graphData.color}}/>}
+          {graphData && graphData.websiteUrl !== '' && graphData.websiteUrl !== null && <Button icon={<Icon
+            style={{paddingRight: 10}}
+            name="web"
+            size={22}
+            color={graphData.color}
+          />}
+           onPress={() => Linking.openURL(graphData.websiteUrl)} buttonStyle={{backgroundColor: colors.silver, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Website'} titleStyle={{color: graphData.color}}/>}
+          {graphData && <Button buttonStyle={{backgroundColor: colors.transparent, borderColor: colors.silver, borderWidth: 2, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Know More about ' + graphData.name} titleStyle={{color: colors.silver, fontWeight: 'bold'}} />}
         </ScrollView>
       )
     } else {
