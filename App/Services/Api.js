@@ -1,8 +1,9 @@
 // a library to wrap and simplify api calls
 import apisauce from 'apisauce'
+import Config from '../Config/AppConfig'
 
 // our "constructor"
-const create = (baseURL = 'https://api.github.com/') => {
+const create = (baseURL = Config.BASE_URL) => {
   // ------
   // STEP 1
   // ------
@@ -37,6 +38,7 @@ const create = (baseURL = 'https://api.github.com/') => {
   const getRoot = () => api.get('')
   const getRate = () => api.get('rate_limit')
   const getUser = (username) => api.get('search/users', {q: username})
+  const getCoins = ({base, timePeriod, ids, sort, limit, order}) => api.get('/coins', {base, timePeriod, ids, sort, limit, order})
 
   // ------
   // STEP 3
@@ -54,7 +56,8 @@ const create = (baseURL = 'https://api.github.com/') => {
     // a list of the API functions from step 2
     getRoot,
     getRate,
-    getUser
+    getUser,
+    getCoins
   }
 }
 
