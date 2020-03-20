@@ -78,7 +78,7 @@ class LaunchScreen extends Component {
   render () {
     const {coins, stats} = this.props
     const {graphData, timePeriod, refresh, base} = this.state
-    console.log(stats)
+    console.log(coins)
     if (graphData === null && coins.fetching === false && coins.payload !== null)
     {
      this.setState({graphData: coins.payload.data.coins[0]})
@@ -222,7 +222,7 @@ class LaunchScreen extends Component {
       )
     } else {
        return (
-         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: graphData ? graphData.color : colors.ember}}>
+         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: graphData ? graphData.color : colors.bloodOrange}}>
            <ActivityIndicator color={Colors.silver}/>
          </View>
        )

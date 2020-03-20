@@ -14,7 +14,7 @@
         <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SplashImage" translatesAutoresizingMaskIntoConstraints="NO" id="mLz-pt-VGN">
         </imageView>
       </subviews>
-      <color key="backgroundColor" red="0.1450980392156863" green="0.10196078431372549" blue="0.20392156862745098" alpha="1" colorSpace="calibratedRGB"/>
+      <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
       <constraints>
         <constraint firstItem="mLz-pt-VGN" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="2lH-sI-4y6"/>
         <constraint firstItem="mLz-pt-VGN" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="IxD-gR-6m0"/>
