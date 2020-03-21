@@ -92,7 +92,7 @@ class LaunchScreen extends Component {
             size={34}
             color={colors.silver}
             onPress={() => this.setState({isVisible: true})} />} /> }
-        <SafeAreaView showsVerticalScrollIndicator={false} style={{ backgroundColor: graphData && graphData.color !== null ? graphData.color : colors.ember, flex: 1 }}>
+        <SafeAreaView showsVerticalScrollIndicator={false} style={{ backgroundColor: graphData && graphData.color !== null ? graphData.color : colors.ember }}>
           <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: graphData && graphData.color ? graphData.color : colors.ember }} >
           <View >
           <FlatList data={coins.payload.data.coins} horizontal extraData={refresh}
@@ -182,7 +182,7 @@ class LaunchScreen extends Component {
             <Text h3 h3Style={{color: colors.silver, width: '49%', textAlign: 'center', fontSize: 20}}>{_.ceil(graphData.change, 2) + '%'}</Text>
           </View>}
 
-          {graphData && Dimensions.get("window").height > 700 && <Text style={{color: colors.silver, fontSize: 18, padding: 15}}>{graphData.description}</Text>}
+          {graphData && <Text style={{color: colors.silver, fontSize: 18, padding: 15}}>{graphData.description}</Text>}
           {graphData && graphData.websiteUrl !== '' && graphData.websiteUrl !== null && <Button icon={<Icon
             style={{paddingRight: 10}}
             name="web"
@@ -191,7 +191,7 @@ class LaunchScreen extends Component {
           />}
            onPress={() => Linking.openURL(graphData.websiteUrl)} buttonStyle={{backgroundColor: colors.silver, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Website'} titleStyle={{color: graphData.color}}/>}
           {graphData && <Button buttonStyle={{backgroundColor: colors.transparent, borderColor: colors.silver, borderWidth: 2, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Know More about ' + graphData.name} titleStyle={{color: colors.silver, fontWeight: 'bold'}} />}
-          {graphData && stats.fetching === false && <Overlay  height={400} width={'95%'} isVisible={this.state.isVisible} onBackdropPress={() => this.setState({ isVisible: false })}>
+          {graphData && stats.fetching === false && <Overlay height={450} width={'95%'} isVisible={this.state.isVisible} onBackdropPress={() => this.setState({ isVisible: false })}>
           <Text h2 h2Style={{color: graphData.color ? graphData.color : colors.ember, textAlign: 'center', fontWeight: '700'}}>Global Stats</Text>
           <View style={{ flexDirection: 'column',justifyContent: 'space-around', flex: 1, backgroundColor: colors.transparent }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', padding: 15, backgroundColor: colors.transparent}} >
@@ -204,18 +204,19 @@ class LaunchScreen extends Component {
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: colors.transparent, padding: 15}} >
               <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', flex: 0.5 }}>Totol Exchanges</Text>
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{_.ceil(stats.payload.data.totalExchanges, 2)}</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.totalExchanges, 2)}</Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: colors.transparent, padding: 15}} >
               <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', flex: 0.5 }}>Totol Market Cap</Text>
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: colors.transparent, padding: 15}} >
               <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', flex: 0.5 }}>Totol 24h Volume</Text>
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
             </View>
           </View>
           </Overlay>}
+          <View style={{ height: 100, backgroundColor: graphData && graphData.color ? graphData.color : colors.bloodOrange }} />
           </ScrollView>
         </SafeAreaView>
         </View>
