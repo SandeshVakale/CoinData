@@ -1,6 +1,7 @@
 // a library to wrap and simplify api calls
 import apisauce from 'apisauce'
 import Config from '../Config/AppConfig'
+import { ap } from 'ramda'
 
 // our "constructor"
 const create = (baseURL = Config.BASE_URL) => {
@@ -39,6 +40,7 @@ const create = (baseURL = Config.BASE_URL) => {
   const getRate = () => api.get('rate_limit')
   const getUser = (username) => api.get('search/users', {q: username})
   const getCoins = ({base, timePeriod, ids, sort, limit, order}) => api.get('/coins', {base, timePeriod, ids, sort, limit, order})
+  const getGlobalStats = ({base}) => api.get('/stats', {base})
 
   // ------
   // STEP 3
@@ -57,7 +59,8 @@ const create = (baseURL = Config.BASE_URL) => {
     getRoot,
     getRate,
     getUser,
-    getCoins
+    getCoins,
+    getGlobalStats
   }
 }
 

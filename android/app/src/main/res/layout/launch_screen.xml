@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:contentDescription="Splashscreen"
         android:scaleType="centerCrop"
+        android:layout_margin="0dp"
         android:background="@color/splashprimary"
         android:src="@drawable/splashscreen"/>
 </RelativeLayout>

@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
-import { FlatList, View, Dimensions, ActivityIndicator, ScrollView } from 'react-native'
+import { FlatList, View, Dimensions, ActivityIndicator, ScrollView, Linking, SafeAreaView } from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from '../Themes'
-import { Button, Text } from 'react-native-elements'
+import { Button, Text, Header, Overlay } from 'react-native-elements'
 import { connect } from 'react-redux'
 import CoinsActions from '../Redux/CoinsRedux'
+import GlobalStatsActions from '../Redux/GlobalStatsRedux'
 import SvgUri from 'react-native-svg-uri';
 import _ from 'lodash'
+import moment from 'moment'
 import {
   LineChart
 } from "react-native-chart-kit";
@@ -34,14 +37,16 @@ class LaunchScreen extends Component {
       base: 'USD',
       timePeriod: '24h',
       graphData: null,
-      refresh: false
+      refresh: false,
+      isVisible: false
     }
   }
 
   componentDidMount () {
     const {base, timePeriod} = this.state
-    const {coinsRequest} = this.props
-    coinsRequest(base, timePeriod, null, null, 10, null)
+    const {coinsRequest, globalStatsRequest} = this.props
+    coinsRequest(base, timePeriod, null, null, 50, null)
+    globalStatsRequest(base)
   }
 
 
@@ -49,16 +54,16 @@ class LaunchScreen extends Component {
     const {base, refresh} = this.state
     const {coinsRequest} = this.props
     this.setState({ timePeriod: item.item, refresh: !refresh })
-    console.log('item', item)
-    coinsRequest(base, item.item, null, null, 10, null)
+    coinsRequest(base, item.item, null, null, 50, null)
   }
 
   hotReload = (item) => {
     const {timePeriod, refresh} = this.state
-    const {coinsRequest} = this.props
+    const {coinsRequest, globalStatsRequest} = this.props
     this.setState({ base: item.item, refresh: !refresh })
     //console.log('item', item)
-    coinsRequest(item.item, timePeriod, null, null, 10, null)
+    coinsRequest(item.item, timePeriod, null, null, 50, null)
+    globalStatsRequest(item.item)
   }
 
   componentDidUpdate(prevProps) {
@@ -71,7 +76,7 @@ class LaunchScreen extends Component {
   }
 
   render () {
-    const {coins} = this.props
+    const {coins, stats} = this.props
     const {graphData, timePeriod, refresh, base} = this.state
     console.log(coins)
     if (graphData === null && coins.fetching === false && coins.payload !== null)
@@ -80,12 +85,19 @@ class LaunchScreen extends Component {
     }
     if (coins.fetching === false) {
       return (
-        <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: this.state.graphData && this.state.graphData.color !== null ? this.state.graphData.color : colors.ember, flex: 1 }}>
-          {/*<SafeAreaView />*/}
+        <View style={{ flex: 1, backgroundColor: graphData && graphData.color ? graphData.color : colors.bloodOrange }}>
+          { graphData && <Header containerStyle={{ backgroundColor: graphData.color ? graphData.color : colors.bloodOrange }} rightComponent={<DateAndTime />} centerComponent={{ text: 'coindata', style: { color: colors.silver, fontWeight: '900', fontSize: 28 } }} leftComponent={<Icon
+            // raised
+            name='earth'
+            size={34}
+            color={colors.silver}
+            onPress={() => this.setState({isVisible: true})} />} /> }
+        <SafeAreaView showsVerticalScrollIndicator={false} style={{ backgroundColor: graphData && graphData.color !== null ? graphData.color : colors.ember }}>
+          <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: graphData && graphData.color ? graphData.color : colors.ember }} >
           <View >
           <FlatList data={coins.payload.data.coins} horizontal extraData={refresh}
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ height: 50, borderColor: Colors.coal, marginTop: 50 }}
+                    contentContainerStyle={{ height: 50, borderColor: Colors.coal }}
                     renderItem={(item) => <Button
                       key={item.item.id}
                       titleStyle={{ color: colors.silver }}
@@ -111,9 +123,9 @@ class LaunchScreen extends Component {
             yAxisSuffix={"k"}
             yAxisInterval={1} // optional, defaults to 1
             chartConfig={{
-              backgroundColor: this.state.graphData.color,
-              backgroundGradientFrom: this.state.graphData.color,
-              backgroundGradientTo: this.state.graphData.color,
+              backgroundColor: graphData.color ? graphData.color : colors.bloodOrange,
+              backgroundGradientFrom: graphData.color ? graphData.color : colors.bloodOrange,
+              backgroundGradientTo: graphData.color ? graphData.color : colors.bloodOrange,
               decimalPlaces: 2, // optional, defaults to 2dp
               color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -123,7 +135,7 @@ class LaunchScreen extends Component {
               propsForDots: {
                 r: "6",
                 strokeWidth: "2",
-                stroke: this.state.graphData.color
+                stroke: graphData.color ? graphData.color : colors.bloodOrange
               }
             }}
             bezier
@@ -170,13 +182,48 @@ class LaunchScreen extends Component {
             <Text h3 h3Style={{color: colors.silver, width: '49%', textAlign: 'center', fontSize: 20}}>{_.ceil(graphData.change, 2) + '%'}</Text>
           </View>}
 
-          {graphData && Dimensions.get("window").height > 700 && <Text style={{color: colors.silver, fontSize: 18, padding: 15}}>{graphData.description}</Text>}
-          {graphData && <Button buttonStyle={{backgroundColor: colors.silver, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Get Coins Data ->'} titleStyle={{color: graphData.color}}/>}
-        </ScrollView>
+          {graphData && <Text style={{color: colors.silver, fontSize: 18, padding: 15}}>{graphData.description}</Text>}
+          {graphData && graphData.websiteUrl !== '' && graphData.websiteUrl !== null && <Button icon={<Icon
+            style={{paddingRight: 10}}
+            name="web"
+            size={22}
+            color={graphData.color ? graphData.color : colors.bloodOrange}
+          />}
+           onPress={() => Linking.openURL(graphData.websiteUrl)} buttonStyle={{backgroundColor: colors.silver, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Website'} titleStyle={{color: graphData.color}}/>}
+          {graphData && <Button buttonStyle={{backgroundColor: colors.transparent, borderColor: colors.silver, borderWidth: 2, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Know More about ' + graphData.name} titleStyle={{color: colors.silver, fontWeight: 'bold'}} />}
+          {graphData && stats.fetching === false && <Overlay height={450} width={'95%'} isVisible={this.state.isVisible} onBackdropPress={() => this.setState({ isVisible: false })}>
+          <Text h2 h2Style={{color: graphData.color ? graphData.color : colors.bloodOrange, textAlign: 'center', fontWeight: '700'}}>Global Stats</Text>
+          <View style={{ flexDirection: 'column',justifyContent: 'space-around', flex: 1, backgroundColor: colors.transparent }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', padding: 15, backgroundColor: colors.transparent}} >
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', flex: 0.5 }}>Totol Coins</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{stats.payload.data.totalCoins}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', padding: 15, backgroundColor: colors.transparent}} >
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', flex: 0.5 }}>Totol Markets</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{stats.payload.data.totalMarkets}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: colors.transparent, padding: 15}} >
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', flex: 0.5 }}>Totol Exchanges</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{_.ceil(stats.payload.data.totalExchanges, 2)}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: colors.transparent, padding: 15}} >
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', flex: 0.5 }}>Totol Market Cap</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: colors.transparent, padding: 15}} >
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', flex: 0.5 }}>Totol 24h Volume</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
+            </View>
+          </View>
+          </Overlay>}
+          <View style={{ height: 100, backgroundColor: graphData && graphData.color ? graphData.color : colors.bloodOrange }} />
+          </ScrollView>
+        </SafeAreaView>
+        </View>
       )
     } else {
        return (
-         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: this.state.graphData ? this.state.graphData.color : colors.ember}}>
+         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: graphData ? graphData.color : colors.bloodOrange}}>
            <ActivityIndicator color={Colors.silver}/>
          </View>
        )
@@ -197,19 +244,27 @@ const svgBloack = (data) => {
         <Text h4 h4Style={{ fontWeight: 'bold', color: colors.silver, flex: 0.5, textAlign: 'center' }} >{data.name}</Text>
       </View>
     )
-    // expected output: ReferenceError: nonExistentFunction is not defined
-    // Note - error messages will vary depending on browser
+}
+
+const DateAndTime = () => {
+  return (
+      <Text style={{ color: colors.silver, fontSize: 14, fontWeight: 'bold' }}>{moment().format('MMMM Do')}</Text>
+  )
+  // expected output: ReferenceError: nonExistentFunction is not defined
+  // Note - error messages will vary depending on browser
 }
 
 const mapStateToProps = (state) => {
   return {
-    coins: state.coins
+    coins: state.coins,
+    stats: state.stats
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    coinsRequest: (base, timePeriod, ids, sort, limit, order) => dispatch(CoinsActions.coinsRequest(base, timePeriod, ids, sort, limit, order))
+    coinsRequest: (base, timePeriod, ids, sort, limit, order) => dispatch(CoinsActions.coinsRequest(base, timePeriod, ids, sort, limit, order)),
+    globalStatsRequest: (base) => dispatch(GlobalStatsActions.globalStatsRequest(base))
   }
 }
 
