@@ -15,6 +15,8 @@ import colors from '../Themes/Colors'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { LineChart } from 'react-native-chart-kit'
 import { Colors } from '../Themes'
+import SvgUri from 'react-native-svg-uri'
+import { F } from 'ramda'
 
 const timePeriods = [
   '24h','7d','30d', '1y', '5y'
@@ -64,6 +66,8 @@ class DetailScreen extends Component {
     console.log(coin)
     if ( coin.fetching === false &&  coin.payload && coin.payload.data ) {
       let data = coin.payload.data.coin
+      let AllTimeHigh = new Date(data.allTimeHigh.timestamp)
+      let FirstSeen = new Date(data.firstSeen)
       return (
         <View style={{ flex: 1, backgroundColor: color ? color : colors.bloodOrange }}>
           <Header containerStyle={{ backgroundColor: color ? color : colors.bloodOrange }} rightComponent={<DateAndTime />} leftComponent={<Icon
@@ -143,12 +147,20 @@ class DetailScreen extends Component {
                       }/>
           </View>
 
-              <View style={{padding: 10}} >
-                <Text style={{ fontSize: 18, backgroundColor: color, fontWeight: 'bold', color: colors.silver }}>{(timePeriod).toUpperCase() + ' all time high'}</Text>
+              <View style={{padding: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}} >
+                <View style={{ flexDirection: 'column' }} >
+                <Text style={{ fontSize: 18, backgroundColor: color, fontWeight: 'bold', color: colors.silver }}>{'All time high'}</Text>
                 <View style={{ backgroundColor: color, flexDirection: 'row', alignItems: 'center' }} >
                   <Text h4 h4Style={{ backgroundColor: color, color: colors.silver, fontWeight: 'bold' }} >{coin.payload.data.base.sign} {_.ceil(data.allTimeHigh.price, 2)}</Text>
-                  {/*<Text style={{fontSize: 18, fontWeight: 'bold', color: colors.silver, paddingLeft: 15}} >{moment.unix(data.allTimeHigh.timestamp).format("MM/DD/YY")}</Text>*/}
+                  <Text style={{fontSize: 18, fontWeight: 'bold', color: colors.silver, paddingLeft: 15}} >{AllTimeHigh.getDate() + '/' + (AllTimeHigh.getMonth()+1) + '/' + AllTimeHigh.getFullYear()}</Text>
                 </View>
+                </View>
+                <SvgUri
+                  style={{flex: 0.5, alignItems: 'center'}}
+                  width={60}
+                  height={60}
+                  source={{ uri: data.iconUrl}}
+                />
               </View>
           <Text h4 h4Style={{color: colors.silver, fontWeight: 'bold', padding: 10}} >About {data.name}</Text>
           <Text style={{color: colors.silver, fontSize: 18, paddingHorizontal: 10, paddingBottom: 10}}>{data.description}</Text>
@@ -195,6 +207,13 @@ class DetailScreen extends Component {
                   <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold'}}>Number Of Exchanges</Text>
                 </View>
                 <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{_.ceil(data.numberOfExchanges, 2)}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: 10, backgroundColor: colors.transparent}} >
+                <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
+                  <Icon size={24} style={{paddingHorizontal: 5}} name={'calendar-clock'} color={colors.silver} />
+                  <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold'}}>First Seen</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{FirstSeen.getDate() + '/' + (FirstSeen.getMonth()+1) + '/' + FirstSeen.getFullYear()}</Text>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: 10, backgroundColor: colors.transparent}} >
                 <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>

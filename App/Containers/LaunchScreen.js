@@ -92,7 +92,6 @@ class LaunchScreen extends Component {
             size={34}
             color={colors.silver}
             onPress={() => this.setState({isVisible: true})} />} /> }
-        <SafeAreaView showsVerticalScrollIndicator={false} style={{ backgroundColor: graphData && graphData.color !== null ? graphData.color : colors.ember }}>
           <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: graphData && graphData.color ? graphData.color : colors.ember }} >
           <View >
           <FlatList data={coins.payload.data.coins} horizontal extraData={refresh}
@@ -217,7 +216,6 @@ class LaunchScreen extends Component {
           </Overlay>}
           <View style={{ height: 100, backgroundColor: graphData && graphData.color ? graphData.color : colors.bloodOrange }} />
           </ScrollView>
-        </SafeAreaView>
         </View>
       )
     } else {
