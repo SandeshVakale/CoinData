@@ -41,6 +41,7 @@ const create = (baseURL = Config.BASE_URL) => {
   const getUser = (username) => api.get('search/users', {q: username})
   const getCoins = ({base, timePeriod, ids, sort, limit, order}) => api.get('/coins', {base, timePeriod, ids, sort, limit, order})
   const getGlobalStats = ({base}) => api.get('/stats', {base})
+  const getCoin = ({ coin_id, base, timePeriod }) => api.get(`/coin/${coin_id}`, { base, timePeriod })
 
   // ------
   // STEP 3
@@ -60,7 +61,8 @@ const create = (baseURL = Config.BASE_URL) => {
     getRate,
     getUser,
     getCoins,
-    getGlobalStats
+    getGlobalStats,
+    getCoin
   }
 }
 
