@@ -85,8 +85,8 @@ class LaunchScreen extends Component {
     }
     if (coins.fetching === false) {
       return (
-        <View style={{ flex: 1, backgroundColor: graphData && graphData.color ? graphData.color : colors.ember }}>
-          { graphData && <Header containerStyle={{ backgroundColor: graphData.color ? graphData.color : colors.ember }} rightComponent={<DateAndTime />} centerComponent={{ text: 'coindata', style: { color: colors.silver, fontWeight: '900', fontSize: 28 } }} leftComponent={<Icon
+        <View style={{ flex: 1, backgroundColor: graphData && graphData.color ? graphData.color : colors.bloodOrange }}>
+          { graphData && <Header containerStyle={{ backgroundColor: graphData.color ? graphData.color : colors.bloodOrange }} rightComponent={<DateAndTime />} centerComponent={{ text: 'coindata', style: { color: colors.silver, fontWeight: '900', fontSize: 28 } }} leftComponent={<Icon
             // raised
             name='earth'
             size={34}
@@ -123,9 +123,9 @@ class LaunchScreen extends Component {
             yAxisSuffix={"k"}
             yAxisInterval={1} // optional, defaults to 1
             chartConfig={{
-              backgroundColor: graphData.color ? graphData.color : colors.ember,
-              backgroundGradientFrom: graphData.color ? graphData.color : colors.ember,
-              backgroundGradientTo: graphData.color ? graphData.color : colors.ember,
+              backgroundColor: graphData.color ? graphData.color : colors.bloodOrange,
+              backgroundGradientFrom: graphData.color ? graphData.color : colors.bloodOrange,
+              backgroundGradientTo: graphData.color ? graphData.color : colors.bloodOrange,
               decimalPlaces: 2, // optional, defaults to 2dp
               color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -135,7 +135,7 @@ class LaunchScreen extends Component {
               propsForDots: {
                 r: "6",
                 strokeWidth: "2",
-                stroke: graphData.color ? graphData.color : colors.ember
+                stroke: graphData.color ? graphData.color : colors.bloodOrange
               }
             }}
             bezier
@@ -187,32 +187,32 @@ class LaunchScreen extends Component {
             style={{paddingRight: 10}}
             name="web"
             size={22}
-            color={graphData.color ? graphData.color : colors.ember}
+            color={graphData.color ? graphData.color : colors.bloodOrange}
           />}
            onPress={() => Linking.openURL(graphData.websiteUrl)} buttonStyle={{backgroundColor: colors.silver, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Website'} titleStyle={{color: graphData.color}}/>}
           {graphData && <Button buttonStyle={{backgroundColor: colors.transparent, borderColor: colors.silver, borderWidth: 2, marginVertical: 10, paddingHorizontal: 30, width: '80%', alignSelf: 'center'}} title={'Know More about ' + graphData.name} titleStyle={{color: colors.silver, fontWeight: 'bold'}} />}
           {graphData && stats.fetching === false && <Overlay height={450} width={'95%'} isVisible={this.state.isVisible} onBackdropPress={() => this.setState({ isVisible: false })}>
-          <Text h2 h2Style={{color: graphData.color ? graphData.color : colors.ember, textAlign: 'center', fontWeight: '700'}}>Global Stats</Text>
+          <Text h2 h2Style={{color: graphData.color ? graphData.color : colors.bloodOrange, textAlign: 'center', fontWeight: '700'}}>Global Stats</Text>
           <View style={{ flexDirection: 'column',justifyContent: 'space-around', flex: 1, backgroundColor: colors.transparent }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', padding: 15, backgroundColor: colors.transparent}} >
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', flex: 0.5 }}>Totol Coins</Text>
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{stats.payload.data.totalCoins}</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', flex: 0.5 }}>Totol Coins</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{stats.payload.data.totalCoins}</Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', padding: 15, backgroundColor: colors.transparent}} >
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', flex: 0.5 }}>Totol Markets</Text>
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{stats.payload.data.totalMarkets}</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', flex: 0.5 }}>Totol Markets</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{stats.payload.data.totalMarkets}</Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: colors.transparent, padding: 15}} >
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', flex: 0.5 }}>Totol Exchanges</Text>
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.totalExchanges, 2)}</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', flex: 0.5 }}>Totol Exchanges</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{_.ceil(stats.payload.data.totalExchanges, 2)}</Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: colors.transparent, padding: 15}} >
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', flex: 0.5 }}>Totol Market Cap</Text>
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', flex: 0.5 }}>Totol Market Cap</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: colors.transparent, padding: 15}} >
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', flex: 0.5 }}>Totol 24h Volume</Text>
-              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.ember, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', flex: 0.5 }}>Totol 24h Volume</Text>
+              <Text style={{ fontSize: 18, color: graphData.color ? graphData.color : colors.bloodOrange, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
             </View>
           </View>
           </Overlay>}
