@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
-import { View, ActivityIndicator, Dimensions, FlatList, ScrollView } from 'react-native'
+import { View, ActivityIndicator, Dimensions, FlatList, ScrollView, Linking } from 'react-native'
 import { connect } from 'react-redux'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 import CoinActions from '../Redux/CoinRedux'
-import { Button, Text, Header, Overlay } from 'react-native-elements'
+import { Button, Text, Header, Divider } from 'react-native-elements'
 import {DateAndTime} from '../Components/DateAndTime'
 import _ from 'lodash'
+import moment from 'moment'
 
 // Styles
 import styles from './Styles/DetailScreenStyle'
@@ -60,6 +61,7 @@ class DetailScreen extends Component {
   render () {
     const { coin } = this.props
     const { color, base, timePeriod, refresh } = this.state
+    console.log(coin)
     if ( coin.fetching === false &&  coin.payload && coin.payload.data ) {
       let data = coin.payload.data.coin
       return (
@@ -71,11 +73,14 @@ class DetailScreen extends Component {
             color={colors.silver}
             onPress={() => this.props.navigation.goBack()} />}
             centerComponent={{ text: data.name, style: { color: colors.silver, fontWeight: '900', fontSize: 28 } }}/>
-            <Text style={{ fontSize: 18, backgroundColor: color, fontWeight: 'bold', color: colors.silver, paddingLeft: 10 }}>Price</Text>
-          <View style={{ backgroundColor: color, flexDirection: 'row', alignItems: 'center', paddingLeft: 10 }} >
-            <Text h4 h4Style={{ backgroundColor: color, color: colors.silver, fontWeight: 'bold' }} >{coin.payload.data.base.sign} {_.ceil(data.price, 2)}</Text>
-            <Text style={{fontSize: 18, fontWeight: 'bold', color: Math.sign(data.change) === -1 ? colors.error: colors.lightgreen, paddingLeft: 15}} >{data.change}%</Text>
-          </View>
+            <ScrollView showsVerticalScrollIndicator={false} style={{backgroundColor: color ? color : colors.bloodOrange}} >
+            <View style={{padding: 10}} >
+              <Text style={{ fontSize: 18, backgroundColor: color, fontWeight: 'bold', color: colors.silver }}>Price</Text>
+                <View style={{ backgroundColor: color, flexDirection: 'row', alignItems: 'center' }} >
+                  <Text h4 h4Style={{ backgroundColor: color, color: colors.silver, fontWeight: 'bold' }} >{coin.payload.data.base.sign} {_.ceil(data.price, 2)}</Text>
+                  <Text style={{fontSize: 18, fontWeight: 'bold', color: Math.sign(data.change) === -1 ? colors.error: colors.lightgreen, paddingLeft: 15}} >{data.change}%</Text>
+                </View>
+            </View>
           <View style={{ alignItems: 'center' }}>
             {data && <LineChart
               data={{
@@ -137,6 +142,88 @@ class DetailScreen extends Component {
                         title={item.item}/>
                       }/>
           </View>
+
+              <View style={{padding: 10}} >
+                <Text style={{ fontSize: 18, backgroundColor: color, fontWeight: 'bold', color: colors.silver }}>{(timePeriod).toUpperCase() + ' all time high'}</Text>
+                <View style={{ backgroundColor: color, flexDirection: 'row', alignItems: 'center' }} >
+                  <Text h4 h4Style={{ backgroundColor: color, color: colors.silver, fontWeight: 'bold' }} >{coin.payload.data.base.sign} {_.ceil(data.allTimeHigh.price, 2)}</Text>
+                  {/*<Text style={{fontSize: 18, fontWeight: 'bold', color: colors.silver, paddingLeft: 15}} >{moment.unix(data.allTimeHigh.timestamp).format("MM/DD/YY")}</Text>*/}
+                </View>
+              </View>
+          <Text h4 h4Style={{color: colors.silver, fontWeight: 'bold', padding: 10}} >About {data.name}</Text>
+          <Text style={{color: colors.silver, fontSize: 18, paddingHorizontal: 10, paddingBottom: 10}}>{data.description}</Text>
+          <Divider style={{ backgroundColor: colors.silver }} />
+          <Text h4 h4Style={{color: colors.silver, fontWeight: 'bold', padding: 10}} >Market Stats</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: 10, backgroundColor: colors.transparent}} >
+                <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
+                  <Icon size={24} style={{paddingHorizontal: 5}} name={'chart-bar'} color={colors.silver} />
+                <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold'}}>Market Capital</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coin.payload.data.base.sign} {data.marketCap}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: 10, backgroundColor: colors.transparent}} >
+                <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
+                  <Icon size={24} style={{paddingHorizontal: 5}} name={'chart-bar-stacked'} color={colors.silver} />
+                  <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold'}}>Volume</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{coin.payload.data.base.sign} {data.volume}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: 10, backgroundColor: colors.transparent}} >
+                <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
+                  <Icon size={24} style={{paddingHorizontal: 5}} name={'chart-donut'} color={colors.silver} />
+                  <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold'}}>Circulating Supply</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{_.ceil(data.circulatingSupply, 2)}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: 10, backgroundColor: colors.transparent}} >
+                <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
+                  <Icon size={24} style={{paddingHorizontal: 5}} name={'chart-pie'} color={colors.silver} />
+                  <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold'}}>Total Supply</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{_.ceil(data.totalSupply, 2)}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: 10, backgroundColor: colors.transparent}} >
+                <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
+                  <Icon size={24} style={{paddingHorizontal: 5}} name={'chart-bubble'} color={colors.silver} />
+                  <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold'}}>Number Of Markets</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{_.ceil(data.numberOfMarkets, 2)}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: 10, backgroundColor: colors.transparent}} >
+                <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
+                  <Icon size={24} style={{paddingHorizontal: 5}} name={'chart-scatterplot-hexbin'} color={colors.silver} />
+                  <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold'}}>Number Of Exchanges</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{_.ceil(data.numberOfExchanges, 2)}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', padding: 10, backgroundColor: colors.transparent}} >
+                <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
+                  <Icon size={24} style={{paddingHorizontal: 5}} name={'gesture-swipe-up'} color={colors.silver} />
+                  <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold'}}>Popularity</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold', textAlign: 'right', right: 0, flex: 0.5 }}>{data.rank}</Text>
+              </View>
+          <Divider style={{ backgroundColor: colors.silver }} />
+          <Text h4 h4Style={{color: colors.silver, fontWeight: 'bold', padding: 10}} >Links</Text>
+              <FlatList data={data.links} style={{paddingBottom: 15}} horizontal renderItem={(item) => <Button
+                key={item.item.id}
+                onPress={() => Linking.openURL(item.item.url)}
+                buttonStyle={{backgroundColor: colors.silver, marginHorizontal: 10, borderRadius: 20, paddingHorizontal: 15, alignSelf: 'center'}}
+                title={'#' + item.item.name}
+                titleStyle={{color: color}}/>
+              }/>
+              <Divider style={{ backgroundColor: colors.silver }} />
+              <Text h4 h4Style={{color: colors.silver, fontWeight: 'bold', padding: 10}} >Socials</Text>
+              <FlatList data={data.socials} style={{paddingBottom: 15}} horizontal renderItem={(item) => <Button
+                key={item.item.id}
+                onPress={() => Linking.openURL(item.item.url)}
+                buttonStyle={{backgroundColor: colors.silver, marginHorizontal: 10, borderRadius: 20, paddingHorizontal: 15, alignSelf: 'center'}}
+                title={'#' + item.item.name}
+                titleStyle={{color: color}}/>
+              }/>
+              <Divider style={{ backgroundColor: colors.silver }} />
+
+            </ScrollView>
         </View>
       )
     } else {

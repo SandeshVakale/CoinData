@@ -20,7 +20,7 @@ export function * getCoin (api, action) {
   // const currentData = yield select(CoinSelectors.getData)
   // make the call to the api
   const response = yield call(api.getCoin, {coin_id, base, timePeriod})
-  console.log('response', response)
+  // console.log('response', response)
 
   // success?
   if (response.ok) {
