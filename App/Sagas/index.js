@@ -10,6 +10,7 @@ import { GithubTypes } from '../Redux/GithubRedux'
 import { CoinsTypes } from '../Redux/CoinsRedux'
 import { GlobalStatsTypes } from '../Redux/GlobalStatsRedux'
 import { CoinTypes } from '../Redux/CoinRedux'
+import { CoinHistoryTypes } from '../Redux/CoinHistoryRedux'
 
 /* ------------- Sagas ------------- */
 
@@ -18,6 +19,7 @@ import { getUserAvatar } from './GithubSagas'
 import { getCoins } from './CoinsSagas'
 import { getGlobalStats } from './GlobalStatsSagas'
 import { getCoin } from './CoinSagas'
+import { getCoinHistory } from './CoinHistorySagas'
 /* ------------- API ------------- */
 
 // The API we use is only used from Sagas, so we create it here and pass along
@@ -35,6 +37,7 @@ export default function * root () {
     takeLatest(GithubTypes.USER_REQUEST, getUserAvatar, api),
     takeEvery(CoinsTypes.COINS_REQUEST, getCoins, api),
     takeEvery(GlobalStatsTypes.GLOBAL_STATS_REQUEST, getGlobalStats, api),
-    takeLatest(CoinTypes.COIN_REQUEST, getCoin, api)
+    takeLatest(CoinTypes.COIN_REQUEST, getCoin, api),
+    takeLatest(CoinHistoryTypes.COIN_HISTORY_REQUEST, getCoinHistory, api)
   ])
 }

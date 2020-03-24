@@ -3,11 +3,13 @@ import { View, ActivityIndicator, Dimensions, FlatList, ScrollView, Linking } fr
 import { connect } from 'react-redux'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
+
+import FlashMessage, { showMessage } from 'react-native-flash-message'
 import CoinActions from '../Redux/CoinRedux'
+import CoinHistoryActions from '../Redux/CoinHistoryRedux'
 import { Button, Text, Header, Divider } from 'react-native-elements'
 import { DateAndTime } from '../Components/DateAndTime'
 import _ from 'lodash'
-import moment from 'moment'
 
 // Styles
 import styles from './Styles/DetailScreenStyle'
@@ -16,7 +18,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { LineChart } from 'react-native-chart-kit'
 import { Colors } from '../Themes'
 import SvgUri from 'react-native-svg-uri'
-import { F } from 'ramda'
 
 const timePeriods = [
   '24h', '7d', '30d', '1y', '5y',
@@ -40,32 +41,38 @@ class DetailScreen extends Component {
   }
 
   componentDidMount () {
-    const { coinRequest } = this.props
+    const { coinRequest, coinHistoryRequest } = this.props
     const { base, timePeriod, id } = this.state
     coinRequest(id, base, timePeriod)
+    coinHistoryRequest(id, timePeriod, base)
   }
 
   reload = (item) => {
     const { base, refresh, id } = this.state
-    const { coinRequest } = this.props
+    const { coinRequest, coinHistoryRequest } = this.props
     this.setState({ timePeriod: item.item, refresh: !refresh })
     coinRequest(id, base, item.item)
+    coinHistoryRequest(id, item.item, base)
   }
 
   hotReload = (item) => {
     const { timePeriod, refresh, id } = this.state
-    const { coinRequest } = this.props
+    const { coinRequest, coinHistoryRequest } = this.props
     this.setState({ base: item.item, refresh: !refresh })
     //console.log('item', item)
     coinRequest(id, item.item, timePeriod)
+    coinHistoryRequest(id, timePeriod, item.item)
   }
 
   render () {
-    const { coin } = this.props
+    const { coin, coinHistory } = this.props
     const { color, base, timePeriod, refresh } = this.state
-    console.log(coin)
-    if (coin.fetching === false && coin.payload && coin.payload.data) {
+    // console.log('coinHistory', coinHistory)
+    if (coin.fetching === false && coin.payload && coin.payload.data && coinHistory.fetching === false) {
       let data = coin.payload.data.coin
+      let history = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.price}) : []
+      let labels = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.timestamp}) : []
+      // console.log('labels', labels)
       let AllTimeHigh = new Date(data.allTimeHigh.timestamp)
       let FirstSeen = new Date(data.firstSeen)
       return (
@@ -105,15 +112,30 @@ class DetailScreen extends Component {
                 data={{
                   datasets: [
                     {
-                      data: data.history,
+                      data: history,
                     },
                   ],
                 }}
-                withDots={false}
+                withDots={true}
                 width={Dimensions.get('window').width} // from react-native
                 height={280}
+                withInnerLines={false}
+                withVerticalLabels={false}
                 yAxisLabel={coin.payload.data.base.sign}
                 yAxisInterval={1} // optional, defaults to 1
+                onDataPointClick={({ value, index }) =>{
+                  let currentDate = new Date(labels[index])
+                  let date = currentDate.getDate();
+                  let month = currentDate.getMonth();
+                  let year = currentDate.getFullYear();
+                  showMessage({
+                    message: `Price of ${data.name} on ${date}/${month + 1}/${year}`,
+                    description: value,
+                    type: "default",
+                    backgroundColor: color ? color : colors.bloodOrange, // background color
+                    color: colors.silver, // text color
+                  })}
+                }
                 chartConfig={{
                   backgroundColor: color ? color : colors.bloodOrange,
                   backgroundGradientFrom: color ? color : colors.bloodOrange,
@@ -125,15 +147,21 @@ class DetailScreen extends Component {
                     // borderRadius: 16,
                   },
                   propsForDots: {
-                    r: '6',
+                    r: '0',
                     strokeWidth: '2',
                     stroke: color ? color : colors.bloodOrange,
                   },
                 }}
                 bezier
-                style={{}}
               />}
             </View>
+            <FlashMessage
+              position="top"
+              // floating
+              // style={{ height: 50, }}
+              hideStatusBar={true}
+              titleStyle={{ fontWeight: 'bold' }}
+            />
             <View style={{ height: 100, alignItems: 'center', marginTop: -100 }}>
               <FlatList data={timePeriods} horizontal extraData={refresh}
                         style={{ height: 50 }}
@@ -421,12 +449,14 @@ class DetailScreen extends Component {
 const mapStateToProps = (state) => {
   return {
     coin: state.coin,
+    coinHistory: state.coinHistory,
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     coinRequest: (coin_id, base, timePeriod) => dispatch(CoinActions.coinRequest(coin_id, base, timePeriod)),
+    coinHistoryRequest: (coin_id, timePeriod, base) => dispatch(CoinHistoryActions.coinHistoryRequest(coin_id, timePeriod, base)),
   }
 }
 
