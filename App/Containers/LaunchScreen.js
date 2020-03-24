@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { FlatList, View, Dimensions, ActivityIndicator, ScrollView, Linking, SafeAreaView } from 'react-native'
+import { FlatList, View, Dimensions, ActivityIndicator, ScrollView, Linking } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { Colors } from '../Themes'
 import { Button, Text, Header, Overlay } from 'react-native-elements'
@@ -18,7 +18,7 @@ import styles from './Styles/LaunchScreenStyles'
 import colors from '../Themes/Colors'
 
 const timePeriods = [
-  '24h', '7d', '30d',
+  '24h', '7d', '30d', '1y', '5y'
 ]
 
 // const hours = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ]
