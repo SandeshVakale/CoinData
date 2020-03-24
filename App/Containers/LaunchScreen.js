@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { FlatList, View, Dimensions, ActivityIndicator, ScrollView, Linking } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { Colors } from '../Themes'
-import { Button, Text, Header, Overlay } from 'react-native-elements'
+import { Button, Text, Header, Overlay, Divider } from 'react-native-elements'
 import { connect } from 'react-redux'
 import CoinsActions from '../Redux/CoinsRedux'
 import GlobalStatsActions from '../Redux/GlobalStatsRedux'
@@ -18,7 +18,7 @@ import styles from './Styles/LaunchScreenStyles'
 import colors from '../Themes/Colors'
 
 const timePeriods = [
-  '24h', '7d', '30d', '1y', '5y'
+  '24h', '7d', '30d', '1y', '5y',
 ]
 
 // const hours = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ]
@@ -76,7 +76,7 @@ class LaunchScreen extends Component {
   render () {
     const { coins, stats } = this.props
     const { graphData, timePeriod, refresh, base, active } = this.state
-    // console.log(coins)
+    console.log(coins)
     if (graphData === null && coins.fetching === false && coins.payload !== null) {
       this.setState({ graphData: coins.payload.data.coins[0] })
     }
@@ -349,6 +349,116 @@ class LaunchScreen extends Component {
                 </View>
               </View>
             </Overlay>}
+
+            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Winners</Text>
+            <View>
+              <FlatList data={coins.payload.data.coins.slice(0, 10)} horizontal extraData={refresh}
+                        showsHorizontalScrollIndicator={false}
+                // contentContainerStyle={{ height: 50, borderColor: Colors.coal }}
+                        renderItem={(item) =>
+                          <View style={{
+                            flexDirection: 'column',
+                            justifyContent: 'space-around',
+                            alignItems: 'center',
+                            alignContent: 'center',
+                            height: 100,
+                            width: 200,
+                            marginHorizontal: 10,
+                            borderRadius: 12,
+                            borderWidth: 2,
+                            borderColor: colors.silver,
+                            backgroundColor: graphData ? graphData.color : colors.bloodOrange,
+                          }}>
+                            <Text h4 h4Style={{
+                              color: colors.lightgreen,
+                              fontWeight: 'bold',
+                            }}>+{item.item.change} %</Text>
+                            <View style={{
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              alignContent: 'center',
+                            }}>
+                              <SvgUri
+                                style={{ paddingRight: 5, flex: 0.5, alignItems: 'center'}}
+                                width={40}
+                                height={40}
+                                source={{ uri: item.item.iconUrl }}
+                              />
+                              <View style={{
+                                flexDirection: 'column',
+                                justifyContent: 'space-around',
+                                alignItems: 'center',
+                                alignContent: 'center',
+                                flex: 0.5
+                              }}>
+                                <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
+                                <Text style={{
+                                  color: colors.silver,
+                                  fontSize: 14,
+                                  textAlign: 'center'
+                                }}>{coins.payload.data.base.sign}{_.ceil(item.item.price, 2)}</Text>
+                              </View>
+                            </View>
+                          </View>}/>
+
+            </View>
+
+
+            <Divider style={{ backgroundColor: colors.silver, marginTop: 15 }}/>
+            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Losers</Text>
+            <View>
+              <FlatList data={coins.payload.data.coins.slice(Math.max(coins.payload.data.coins.length - 10, 0))} horizontal extraData={refresh}
+                        showsHorizontalScrollIndicator={false}
+                // contentContainerStyle={{ height: 50, borderColor: Colors.coal }}
+                        renderItem={(item) =>
+                          <View style={{
+                            flexDirection: 'column',
+                            justifyContent: 'space-around',
+                            alignItems: 'center',
+                            alignContent: 'center',
+                            height: 100,
+                            width: 200,
+                            marginHorizontal: 10,
+                            borderRadius: 12,
+                            borderWidth: 2,
+                            borderColor: colors.silver,
+                            backgroundColor: graphData ? graphData.color : colors.bloodOrange,
+                          }}>
+                            <Text h4 h4Style={{
+                              color: colors.lightgreen,
+                              fontWeight: 'bold',
+                            }}>{item.item.change} %</Text>
+                            <View style={{
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              alignContent: 'center',
+                            }}>
+                              <SvgUri
+                                style={{ paddingRight: 5, flex: 0.5, alignItems: 'center'}}
+                                width={40}
+                                height={40}
+                                source={{ uri: item.item.iconUrl }}
+                              />
+                              <View style={{
+                                flexDirection: 'column',
+                                justifyContent: 'space-around',
+                                alignItems: 'center',
+                                alignContent: 'center',
+                                flex: 0.5
+                              }}>
+                                <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
+                                <Text style={{
+                                  color: colors.silver,
+                                  fontSize: 14,
+                                  textAlign: 'center'
+                                }}>{coins.payload.data.base.sign}{_.ceil(item.item.price, 2)}</Text>
+                              </View>
+                            </View>
+                          </View>}/>
+
+            </View>
             <View style={{
               height: 100,
               backgroundColor: graphData && graphData.color ? graphData.color : colors.bloodOrange,
