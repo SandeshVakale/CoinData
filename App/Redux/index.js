@@ -10,7 +10,8 @@ export const reducers = combineReducers({
   github: require('./GithubRedux').reducer,
   search: require('./SearchRedux').reducer,
   coins: require('./CoinsRedux').reducer,
-  stats: require('./GlobalStatsRedux').reducer
+  stats: require('./GlobalStatsRedux').reducer,
+  coin: require('./CoinRedux').reducer
 })
 
 export default () => {
