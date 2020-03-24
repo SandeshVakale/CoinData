@@ -67,7 +67,7 @@ class DetailScreen extends Component {
   render () {
     const { coin, coinHistory } = this.props
     const { color, base, timePeriod, refresh } = this.state
-    console.log('coinHistory', coinHistory)
+    // console.log('coinHistory', coinHistory)
     if (coin.fetching === false && coin.payload && coin.payload.data && coinHistory.fetching === false) {
       let data = coin.payload.data.coin
       let history = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.price}) : []

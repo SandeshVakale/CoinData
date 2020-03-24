@@ -118,6 +118,7 @@ class LaunchScreen extends Component {
                     },
                   ],
                 }}
+                withInnerLines={false}
                 withDots={false}
                 width={Dimensions.get('window').width} // from react-native
                 height={280}
