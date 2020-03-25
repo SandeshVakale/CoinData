@@ -43,6 +43,8 @@ const create = (baseURL = Config.BASE_URL) => {
   const getGlobalStats = ({base}) => api.get('/stats', {base})
   const getCoin = ({ coin_id, base, timePeriod }) => api.get(`/coin/${coin_id}`, { base, timePeriod })
   const getCoinHistory = ({ coin_id, timeframe, base }) => api.get(`/coin/${coin_id}/history/${timeframe}`, {base})
+  const getWinners = ({ base, timePeriod, sort, limit, order }) => api.get('/coins', {base, timePeriod, sort, limit, order})
+  const getLosers = ({ base, timePeriod, sort, limit, order }) => api.get('/coins', {base, timePeriod, sort, limit, order})
 
   // ------
   // STEP 3
@@ -64,7 +66,9 @@ const create = (baseURL = Config.BASE_URL) => {
     getCoins,
     getGlobalStats,
     getCoin,
-    getCoinHistory
+    getCoinHistory,
+    getWinners,
+    getLosers
   }
 }
 

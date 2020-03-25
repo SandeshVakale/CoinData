@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
-import { FlatList, View, Dimensions, ActivityIndicator, ScrollView, Linking } from 'react-native'
+import { FlatList, View, Dimensions, ActivityIndicator, ScrollView, Linking, TouchableHighlight } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { Colors } from '../Themes'
 import { Button, Text, Header, Overlay, Divider } from 'react-native-elements'
 import { connect } from 'react-redux'
 import CoinsActions from '../Redux/CoinsRedux'
 import GlobalStatsActions from '../Redux/GlobalStatsRedux'
+import WinnersActions from '../Redux/WinnersRedux'
+import LosersAction from '../Redux/LosersRedux'
 import SvgUri from 'react-native-svg-uri'
 import { DateAndTime } from '../Components/DateAndTime'
 import _ from 'lodash'
@@ -44,25 +46,31 @@ class LaunchScreen extends Component {
 
   componentDidMount () {
     const { base, timePeriod } = this.state
-    const { coinsRequest, globalStatsRequest } = this.props
+    const { coinsRequest, globalStatsRequest, winnersRequest, losersRequest } = this.props
     coinsRequest(base, timePeriod, null, null, 50, null)
+    winnersRequest(base, timePeriod, 'change', 10, null)
+    losersRequest(base, timePeriod, 'change', 10, 'asc')
     globalStatsRequest(base)
   }
 
   reload = (item) => {
     const { base, refresh } = this.state
-    const { coinsRequest } = this.props
+    const { coinsRequest, winnersRequest, losersRequest } = this.props
     this.setState({ timePeriod: item.item, refresh: !refresh })
     coinsRequest(base, item.item, null, null, 50, null)
+    winnersRequest(base, item.item, 'change', 10, null)
+    losersRequest(base, item.item, 'change', 10, 'asc')
   }
 
   hotReload = (item) => {
     const { timePeriod, refresh } = this.state
-    const { coinsRequest, globalStatsRequest } = this.props
+    const { coinsRequest, globalStatsRequest, winnersRequest, losersRequest } = this.props
     this.setState({ base: item.item, refresh: !refresh })
     //console.log('item', item)
     coinsRequest(item.item, timePeriod, null, null, 50, null)
     globalStatsRequest(item.item)
+    winnersRequest(item.item, timePeriod, 'change', 10, null)
+    losersRequest(item.item, timePeriod, 'change', 10, 'asc')
   }
 
   componentDidUpdate (prevProps) {
@@ -74,13 +82,13 @@ class LaunchScreen extends Component {
   }
 
   render () {
-    const { coins, stats } = this.props
+    const { coins, stats, winners, losers } = this.props
     const { graphData, timePeriod, refresh, base, active } = this.state
-    console.log(coins)
+    console.log(winners, losers)
     if (graphData === null && coins.fetching === false && coins.payload !== null) {
       this.setState({ graphData: coins.payload.data.coins[0] })
     }
-    if (coins.fetching === false) {
+    if (coins.fetching === false && winners.fetching === false && losers.fetching === false) {
       return (
         <View style={{ flex: 1, backgroundColor: graphData && graphData.color ? graphData.color : colors.bloodOrange }}>
           {graphData &&
@@ -350,68 +358,23 @@ class LaunchScreen extends Component {
               </View>
             </Overlay>}
 
-            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Winners</Text>
-            <View>
-              <FlatList data={coins.payload.data.coins.slice(0, 10)} horizontal extraData={refresh}
-                        showsHorizontalScrollIndicator={false}
-                // contentContainerStyle={{ height: 50, borderColor: Colors.coal }}
-                        renderItem={(item) =>
-                          <View style={{
-                            flexDirection: 'column',
-                            justifyContent: 'space-around',
-                            alignItems: 'center',
-                            alignContent: 'center',
-                            height: 100,
-                            width: 200,
-                            marginHorizontal: 10,
-                            borderRadius: 12,
-                            borderWidth: 2,
-                            borderColor: colors.silver,
-                            backgroundColor: graphData ? graphData.color : colors.bloodOrange,
-                          }}>
-                            <Text h4 h4Style={{
-                              color: colors.lightgreen,
-                              fontWeight: 'bold',
-                            }}>+{item.item.change} %</Text>
-                            <View style={{
-                              flexDirection: 'row',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              alignContent: 'center',
-                            }}>
-                              <SvgUri
-                                style={{ paddingRight: 5, flex: 0.5, alignItems: 'center'}}
-                                width={40}
-                                height={40}
-                                source={{ uri: item.item.iconUrl }}
-                              />
-                              <View style={{
-                                flexDirection: 'column',
-                                justifyContent: 'space-around',
-                                alignItems: 'center',
-                                alignContent: 'center',
-                                flex: 0.5
-                              }}>
-                                <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
-                                <Text style={{
-                                  color: colors.silver,
-                                  fontSize: 14,
-                                  textAlign: 'center'
-                                }}>{coins.payload.data.base.sign}{_.ceil(item.item.price, 2)}</Text>
-                              </View>
-                            </View>
-                          </View>}/>
-
-            </View>
-
-
             <Divider style={{ backgroundColor: colors.silver, marginTop: 15 }}/>
-            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Losers</Text>
+
+            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>{timePeriod.toUpperCase()} Winners</Text>
             <View>
-              <FlatList data={coins.payload.data.coins.slice(Math.max(coins.payload.data.coins.length - 10, 0))} horizontal extraData={refresh}
+              <FlatList data={winners.payload.data.coins.slice(0, 10)} horizontal extraData={refresh}
                         showsHorizontalScrollIndicator={false}
+
                 // contentContainerStyle={{ height: 50, borderColor: Colors.coal }}
                         renderItem={(item) =>
+                          <TouchableHighlight
+                            onPress={() => this.props.navigation.navigate('DetailScreen', {
+                              id: item.item.id,
+                              base: base,
+                              timePeriod: timePeriod,
+                              color: item.item.color,
+                            })}
+                          >
                           <View style={{
                             flexDirection: 'column',
                             justifyContent: 'space-around',
@@ -456,7 +419,74 @@ class LaunchScreen extends Component {
                                 }}>{coins.payload.data.base.sign}{_.ceil(item.item.price, 2)}</Text>
                               </View>
                             </View>
-                          </View>}/>
+                          </View>
+                          </TouchableHighlight>
+                          }/>
+
+            </View>
+
+
+            <Divider style={{ backgroundColor: colors.silver, marginTop: 15 }}/>
+            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>{timePeriod.toUpperCase()} Losers</Text>
+            <View>
+              <FlatList data={losers.payload.data.coins.slice(Math.max(losers.payload.data.coins.length - 10, 0))} horizontal extraData={refresh}
+                        showsHorizontalScrollIndicator={false}
+                // contentContainerStyle={{ height: 50, borderColor: Colors.coal }}
+                        renderItem={(item) =>
+                          <TouchableHighlight
+                            onPress={() => this.props.navigation.navigate('DetailScreen', {
+                              id: item.item.id,
+                              base: base,
+                              timePeriod: timePeriod,
+                              color: item.item.color,
+                            })}
+                          >
+                          <View style={{
+                            flexDirection: 'column',
+                            justifyContent: 'space-around',
+                            alignItems: 'center',
+                            alignContent: 'center',
+                            height: 100,
+                            width: 200,
+                            marginHorizontal: 10,
+                            borderRadius: 12,
+                            borderWidth: 2,
+                            borderColor: colors.silver,
+                            backgroundColor: graphData ? graphData.color : colors.bloodOrange,
+                          }}>
+                            <Text h4 h4Style={{
+                              color: colors.error,
+                              fontWeight: 'bold',
+                            }}>{item.item.change} %</Text>
+                            <View style={{
+                              flexDirection: 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              alignContent: 'center',
+                            }}>
+                              <SvgUri
+                                style={{ paddingRight: 5, flex: 0.5, alignItems: 'center'}}
+                                width={40}
+                                height={40}
+                                source={{ uri: item.item.iconUrl }}
+                              />
+                              <View style={{
+                                flexDirection: 'column',
+                                justifyContent: 'space-around',
+                                alignItems: 'center',
+                                alignContent: 'center',
+                                flex: 0.5
+                              }}>
+                                <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
+                                <Text style={{
+                                  color: colors.silver,
+                                  fontSize: 14,
+                                  textAlign: 'center'
+                                }}>{coins.payload.data.base.sign}{_.ceil(item.item.price, 2)}</Text>
+                              </View>
+                            </View>
+                          </View>
+                          </TouchableHighlight>}/>
 
             </View>
             <View style={{
@@ -499,6 +529,8 @@ const mapStateToProps = (state) => {
   return {
     coins: state.coins,
     stats: state.stats,
+    winners: state.winners,
+    losers: state.losers
   }
 }
 
@@ -506,6 +538,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     coinsRequest: (base, timePeriod, ids, sort, limit, order) => dispatch(CoinsActions.coinsRequest(base, timePeriod, ids, sort, limit, order)),
     globalStatsRequest: (base) => dispatch(GlobalStatsActions.globalStatsRequest(base)),
+    winnersRequest: (base, timePeriod, sort, limit, order) => dispatch(WinnersActions.winnersRequest(base, timePeriod, sort, limit, order)),
+    losersRequest: (base, timePeriod, sort, limit, order) => dispatch(LosersAction.losersRequest(base, timePeriod, sort, limit, order))
   }
 }
 
