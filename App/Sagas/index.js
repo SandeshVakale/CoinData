@@ -13,6 +13,7 @@ import { CoinTypes } from '../Redux/CoinRedux'
 import { CoinHistoryTypes } from '../Redux/CoinHistoryRedux'
 import { LosersTypes } from '../Redux/LosersRedux'
 import { WinnersTypes } from '../Redux/WinnersRedux'
+import { MarketsTypes } from '../Redux/MarketsRedux'
 
 /* ------------- Sagas ------------- */
 
@@ -24,6 +25,7 @@ import { getCoin } from './CoinSagas'
 import { getCoinHistory } from './CoinHistorySagas'
 import { getLosers } from './LosersSagas'
 import { getWinners } from './WinnersSagas'
+import { getMarkets } from './MarketsSagas'
 /* ------------- API ------------- */
 
 // The API we use is only used from Sagas, so we create it here and pass along
@@ -44,6 +46,7 @@ export default function * root () {
     takeLatest(CoinTypes.COIN_REQUEST, getCoin, api),
     takeLatest(CoinHistoryTypes.COIN_HISTORY_REQUEST, getCoinHistory, api),
     takeLatest(WinnersTypes.WINNERS_REQUEST, getWinners, api),
-    takeLatest(LosersTypes.LOSERS_REQUEST, getLosers, api)
+    takeLatest(LosersTypes.LOSERS_REQUEST, getLosers, api),
+    takeLatest(MarketsTypes.MARKETS_REQUEST, getMarkets, api)
   ])
 }
