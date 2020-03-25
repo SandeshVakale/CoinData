@@ -8,6 +8,7 @@ import FlashMessage, { showMessage } from 'react-native-flash-message'
 import CoinActions from '../Redux/CoinRedux'
 import CoinHistoryActions from '../Redux/CoinHistoryRedux'
 import MarketActions from '../Redux/MarketsRedux'
+import ExchangesActions from '../Redux/ExchangesRedux'
 import { Button, Text, Header, Divider } from 'react-native-elements'
 import { DateAndTime } from '../Components/DateAndTime'
 import _ from 'lodash'
@@ -19,7 +20,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { LineChart } from 'react-native-chart-kit'
 import { Colors } from '../Themes'
 import SvgUri from 'react-native-svg-uri'
-import { T } from 'ramda'
 
 const timePeriods = [
   '24h', '7d', '30d', '1y', '5y',
@@ -43,12 +43,13 @@ class DetailScreen extends Component {
   }
 
   componentDidMount () {
-    const { coinRequest, coinHistoryRequest, marketsRequest } = this.props
+    const { coinRequest, coinHistoryRequest, marketsRequest, exchangesRequest } = this.props
     const { base, timePeriod, id } = this.state
-    console.log('this.props', this.props)
+    // console.log('this.props', this.props)
     coinRequest(id, base, timePeriod)
     coinHistoryRequest(id, timePeriod, base)
     marketsRequest(null, id, 10)
+    exchangesRequest(id, 10)
   }
 
   reload = (item) => {
@@ -69,10 +70,10 @@ class DetailScreen extends Component {
   }
 
   render () {
-    const { coin, coinHistory, markets } = this.props
+    const { coin, coinHistory, markets, exchanges } = this.props
     const { color, base, timePeriod, refresh } = this.state
-    // console.log('markets', markets)
-    if (coin.fetching === false && markets.fetching === false && markets.payload && markets.payload.data && coin.payload && coin.payload.data && coinHistory.fetching === false) {
+    // console.log('exchanges', exchanges)
+    if (coin.fetching === false && markets.fetching === false && exchanges.fetching === false && exchanges.payload && exchanges.payload.data && markets.payload && markets.payload.data && coin.payload && coin.payload.data && coinHistory.fetching === false) {
       let data = coin.payload.data.coin
       let history = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.price}) : []
       let labels = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.timestamp}) : []
@@ -433,7 +434,7 @@ class DetailScreen extends Component {
 
             <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Markets Containing {data.name}</Text>
             <FlatList data={markets.payload.data.markets}
-                      contentContainerStyle={{ paddingVertical: 15 }}
+                      contentContainerStyle={{ paddingBottom: 15 }}
                       renderItem={
               (item) => <View style={{ flexDirection: 'row', padding: 5, borderWidth: 1, margin: 5, borderColor: colors.silver, borderRadius: 12}} >
                 <SvgUri
@@ -452,6 +453,29 @@ class DetailScreen extends Component {
                 </View>
               </View>
             } />
+            <Divider style={{ backgroundColor: colors.silver }}/>
+
+            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Exchanges trading {data.name}</Text>
+            <FlatList data={exchanges.payload.data.exchanges}
+                      contentContainerStyle={{ paddingBottom: 15 }}
+                      renderItem={
+                        (item) => <View style={{ flexDirection: 'row', padding: 5, borderWidth: 1, margin: 5, borderColor: colors.silver, borderRadius: 12}} >
+                          <SvgUri
+                            style={{ paddingRight: 5, flex: 0.2, alignItems: 'center'}}
+                            width={40}
+                            height={40}
+                            source={{ uri: item.item.iconUrl }}
+                          />
+                          <View style={{ flex: 0.5, flexDirection: 'column' }}>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >{item.item.name}</Text>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >Markets {item.item.numberOfMarkets}</Text>
+                          </View>
+                          <View style={{ flex: 0.3, flexDirection: 'column' }}>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >Market Share</Text>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver, flex: 0.3 }} >{_.ceil(item.item.marketShare, 5)}</Text>
+                          </View>
+                        </View>
+                      } />
             <Divider style={{ backgroundColor: colors.silver }}/>
           </ScrollView>
         </View>
@@ -476,7 +500,8 @@ const mapStateToProps = (state) => {
   return {
     coin: state.coin,
     coinHistory: state.coinHistory,
-    markets: state.markets
+    markets: state.markets,
+    exchanges: state.exchanges
   }
 }
 
@@ -484,7 +509,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     coinRequest: (coin_id, base, timePeriod) => dispatch(CoinActions.coinRequest(coin_id, base, timePeriod)),
     coinHistoryRequest: (coin_id, timePeriod, base) => dispatch(CoinHistoryActions.coinHistoryRequest(coin_id, timePeriod, base)),
-    marketsRequest: (refCurrencyId, baseCurrencyId, limit) => dispatch(MarketActions.marketsRequest(refCurrencyId, baseCurrencyId, limit))
+    marketsRequest: (refCurrencyId, baseCurrencyId, limit) => dispatch(MarketActions.marketsRequest(refCurrencyId, baseCurrencyId, limit)),
+    exchangesRequest: (refCurrencyId, limit) => dispatch(ExchangesActions.exchangesRequest(refCurrencyId, limit))
   }
 }
 

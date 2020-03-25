@@ -46,6 +46,7 @@ const create = (baseURL = Config.BASE_URL) => {
   const getWinners = ({ base, timePeriod, sort, limit, order }) => api.get('/coins', {base, timePeriod, sort, limit, order})
   const getLosers = ({ base, timePeriod, sort, limit, order }) => api.get('/coins', {base, timePeriod, sort, limit, order})
   const getMarkets = ({ refCurrencyId, baseCurrencyId, limit }) => api.get('/markets', {refCurrencyId, baseCurrencyId, limit})
+  const getExchanges = ({ refCurrencyId, limit }) => api.get('/exchanges', { refCurrencyId, limit })
 
   // ------
   // STEP 3
@@ -70,7 +71,8 @@ const create = (baseURL = Config.BASE_URL) => {
     getCoinHistory,
     getWinners,
     getLosers,
-    getMarkets
+    getMarkets,
+    getExchanges
   }
 }
 

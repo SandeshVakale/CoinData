@@ -411,7 +411,7 @@ class LaunchScreen extends Component {
                                 alignContent: 'center',
                                 flex: 0.5
                               }}>
-                                <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
+                                <Text numberOfLines={1} h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
                                 <Text style={{
                                   color: colors.silver,
                                   fontSize: 14,
@@ -477,7 +477,7 @@ class LaunchScreen extends Component {
                                 alignContent: 'center',
                                 flex: 0.5
                               }}>
-                                <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
+                                <Text numberOfLines={1} h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
                                 <Text style={{
                                   color: colors.silver,
                                   fontSize: 14,
