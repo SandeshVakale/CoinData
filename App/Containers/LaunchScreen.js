@@ -48,7 +48,7 @@ class LaunchScreen extends Component {
     const { base, timePeriod } = this.state
     const { coinsRequest, globalStatsRequest, winnersRequest, losersRequest } = this.props
     coinsRequest(base, timePeriod, null, null, 50, null)
-    winnersRequest(base, timePeriod, 'change', 10, null)
+    winnersRequest(base, timePeriod, 'change', 10, 'desc')
     losersRequest(base, timePeriod, 'change', 10, 'asc')
     globalStatsRequest(base)
   }
@@ -58,7 +58,7 @@ class LaunchScreen extends Component {
     const { coinsRequest, winnersRequest, losersRequest } = this.props
     this.setState({ timePeriod: item.item, refresh: !refresh })
     coinsRequest(base, item.item, null, null, 50, null)
-    winnersRequest(base, item.item, 'change', 10, null)
+    winnersRequest(base, item.item, 'change', 10, 'desc')
     losersRequest(base, item.item, 'change', 10, 'asc')
   }
 
@@ -69,7 +69,7 @@ class LaunchScreen extends Component {
     //console.log('item', item)
     coinsRequest(item.item, timePeriod, null, null, 50, null)
     globalStatsRequest(item.item)
-    winnersRequest(item.item, timePeriod, 'change', 10, null)
+    winnersRequest(item.item, timePeriod, 'change', 10, 'desc')
     losersRequest(item.item, timePeriod, 'change', 10, 'asc')
   }
 
@@ -84,7 +84,7 @@ class LaunchScreen extends Component {
   render () {
     const { coins, stats, winners, losers } = this.props
     const { graphData, timePeriod, refresh, base, active } = this.state
-    console.log(winners, losers)
+    // console.log(winners, losers)
     if (graphData === null && coins.fetching === false && coins.payload !== null) {
       this.setState({ graphData: coins.payload.data.coins[0] })
     }

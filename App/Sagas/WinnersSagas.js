@@ -20,7 +20,7 @@ export function * getWinners (api, action) {
   // const currentData = yield select(WinnersSelectors.getData)
   // make the call to the api
   const response = yield call(api.getWinners, {base, timePeriod, sort, limit, order})
-
+  // console.log('reponse', response)
   // success?
   if (response.ok) {
     // You might need to change the response here - do this with a 'transform',
