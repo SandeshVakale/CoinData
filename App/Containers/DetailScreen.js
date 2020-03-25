@@ -72,7 +72,7 @@ class DetailScreen extends Component {
     const { coin, coinHistory, markets } = this.props
     const { color, base, timePeriod, refresh } = this.state
     // console.log('markets', markets)
-    if (coin.fetching === false && markets.fetching === false && coin.payload && coin.payload.data && coinHistory.fetching === false) {
+    if (coin.fetching === false && markets.fetching === false && markets.payload && markets.payload.data && coin.payload && coin.payload.data && coinHistory.fetching === false) {
       let data = coin.payload.data.coin
       let history = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.price}) : []
       let labels = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.timestamp}) : []
@@ -134,7 +134,7 @@ class DetailScreen extends Component {
                   let year = currentDate.getFullYear();
                   showMessage({
                     message: `Price of ${data.name} on ${date}/${month + 1}/${year}`,
-                    description: value,
+                    description: coin.payload.data.base.sign + value,
                     type: "default",
                     backgroundColor: color ? color : colors.bloodOrange, // background color
                     color: colors.silver, // text color
