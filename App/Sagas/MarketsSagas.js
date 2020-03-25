@@ -20,7 +20,7 @@ export function * getMarkets (api, action) {
   // const currentData = yield select(MarketsSelectors.getData)
   // make the call to the api
   const response = yield call(api.getMarkets, {refCurrencyId, baseCurrencyId, limit})
-  console.log('reponse', response)
+  // console.log('reponse', response)
   // success?
   if (response.ok) {
     // You might need to change the response here - do this with a 'transform',
