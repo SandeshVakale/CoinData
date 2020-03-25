@@ -14,7 +14,8 @@ export const reducers = combineReducers({
   coin: require('./CoinRedux').reducer,
   coinHistory: require('./CoinHistoryRedux').reducer,
   winners: require('./WinnersRedux').reducer,
-  losers: require('./LosersRedux').reducer
+  losers: require('./LosersRedux').reducer,
+  markets: require('./MarketsRedux').reducer
 })
 
 export default () => {

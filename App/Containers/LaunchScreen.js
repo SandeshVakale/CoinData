@@ -84,7 +84,7 @@ class LaunchScreen extends Component {
   render () {
     const { coins, stats, winners, losers } = this.props
     const { graphData, timePeriod, refresh, base, active } = this.state
-    // console.log(winners, losers)
+    console.log('this.props launch', this.props)
     if (graphData === null && coins.fetching === false && coins.payload !== null) {
       this.setState({ graphData: coins.payload.data.coins[0] })
     }
