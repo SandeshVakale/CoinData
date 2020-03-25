@@ -6,6 +6,7 @@ import createSagaMiddleware from 'redux-saga'
 import ScreenTracking from './ScreenTrackingMiddleware'
 import { appNavigatorMiddleware } from '../Navigation/ReduxNavigation'
 import Reactotron from '../Config/ReactotronConfig'
+import logger from 'redux-logger'
 
 // creates the store
 export default (rootReducer, rootSaga) => {
@@ -25,6 +26,10 @@ export default (rootReducer, rootSaga) => {
   const sagaMonitor = Config.useReactotron ? console.tron.createSagaMonitor() : null
   const sagaMiddleware = createSagaMiddleware({ sagaMonitor })
   middleware.push(sagaMiddleware)
+  if (__DEV__) {
+    middleware.push(logger)
+  }
+
 
   /* ------------- Assemble Middleware ------------- */
 
