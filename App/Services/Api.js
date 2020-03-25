@@ -1,8 +1,10 @@
 // a library to wrap and simplify api calls
 import apisauce from 'apisauce'
+import Config from '../Config/AppConfig'
+import { ap } from 'ramda'
 
 // our "constructor"
-const create = (baseURL = 'https://api.github.com/') => {
+const create = (baseURL = Config.BASE_URL) => {
   // ------
   // STEP 1
   // ------
@@ -37,6 +39,12 @@ const create = (baseURL = 'https://api.github.com/') => {
   const getRoot = () => api.get('')
   const getRate = () => api.get('rate_limit')
   const getUser = (username) => api.get('search/users', {q: username})
+  const getCoins = ({base, timePeriod, ids, sort, limit, order}) => api.get('/coins', {base, timePeriod, ids, sort, limit, order})
+  const getGlobalStats = ({base}) => api.get('/stats', {base})
+  const getCoin = ({ coin_id, base, timePeriod }) => api.get(`/coin/${coin_id}`, { base, timePeriod })
+  const getCoinHistory = ({ coin_id, timeframe, base }) => api.get(`/coin/${coin_id}/history/${timeframe}`, {base})
+  const getWinners = ({ base, timePeriod, sort, limit, order }) => api.get('/coins', {base, timePeriod, sort, limit, order})
+  const getLosers = ({ base, timePeriod, sort, limit, order }) => api.get('/coins', {base, timePeriod, sort, limit, order})
 
   // ------
   // STEP 3
@@ -54,7 +62,13 @@ const create = (baseURL = 'https://api.github.com/') => {
     // a list of the API functions from step 2
     getRoot,
     getRate,
-    getUser
+    getUser,
+    getCoins,
+    getGlobalStats,
+    getCoin,
+    getCoinHistory,
+    getWinners,
+    getLosers
   }
 }
 
