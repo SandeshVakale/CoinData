@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, KeyboardAvoidingView, View } from 'react-native'
+import { View } from 'react-native'
 import { connect } from 'react-redux'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
 // Styles
 import styles from './Styles/FavoritesScreenStyle'
-import { Header, Overlay } from 'react-native-elements'
+import { Text, Header, Overlay } from 'react-native-elements'
 import colors from '../Themes/Colors'
 import { DateAndTime } from '../Components/DateAndTime'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -21,7 +21,7 @@ class FavoritesScreen extends Component {
   }
   render () {
 
-    const { stats } = this.props
+    const { stats, coins } = this.props
     return (
       <View style={{ flex: 1 }}>
         <Header containerStyle={{ backgroundColor: colors.bloodOrange }}
@@ -130,7 +130,7 @@ class FavoritesScreen extends Component {
                 textAlign: 'right',
                 right: 0,
                 flex: 0.5,
-              }}>{_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
+              }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
             </View>
             <View style={{
               flexDirection: 'row',
@@ -151,7 +151,7 @@ class FavoritesScreen extends Component {
                 textAlign: 'right',
                 right: 0,
                 flex: 0.5,
-              }}>{_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
+              }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
             </View>
           </View>
         </Overlay>
@@ -162,7 +162,8 @@ class FavoritesScreen extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    stats: state.stats
+    stats: state.stats,
+    coins: state.coins
   }
 }
 

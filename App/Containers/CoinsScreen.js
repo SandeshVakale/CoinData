@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, KeyboardAvoidingView } from 'react-native'
+import { View } from 'react-native'
 import { connect } from 'react-redux'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
@@ -21,7 +21,7 @@ class CoinsScreen extends Component {
   }
   render () {
 
-    const { stats } = this.props
+    const { stats, coins } = this.props
     return (
       <View style={{ flex: 1 }}>
         <Header containerStyle={{ backgroundColor: colors.bloodOrange }}
@@ -129,7 +129,7 @@ class CoinsScreen extends Component {
                 textAlign: 'right',
                 right: 0,
                 flex: 0.5,
-              }}>{_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
+              }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
             </View>
             <View style={{
               flexDirection: 'row',
@@ -150,7 +150,7 @@ class CoinsScreen extends Component {
                 textAlign: 'right',
                 right: 0,
                 flex: 0.5,
-              }}>{_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
+              }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
             </View>
           </View>
         </Overlay>
@@ -161,7 +161,8 @@ class CoinsScreen extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    stats: state.stats
+    stats: state.stats,
+    coins: state.coins
   }
 }
 
