@@ -40,11 +40,10 @@ export default function * root () {
   yield all([
     // some sagas only receive an action
     takeLatest(StartupTypes.STARTUP, startup),
-
     // some sagas receive extra parameters in addition to an action
     takeLatest(GithubTypes.USER_REQUEST, getUserAvatar, api),
-    takeEvery(CoinsTypes.COINS_REQUEST, getCoins, api),
-    takeEvery(GlobalStatsTypes.GLOBAL_STATS_REQUEST, getGlobalStats, api),
+    takeLatest(CoinsTypes.COINS_REQUEST, getCoins, api),
+    takeLatest(GlobalStatsTypes.GLOBAL_STATS_REQUEST, getGlobalStats, api),
     takeLatest(CoinTypes.COIN_REQUEST, getCoin, api),
     takeLatest(CoinHistoryTypes.COIN_HISTORY_REQUEST, getCoinHistory, api),
     takeLatest(WinnersTypes.WINNERS_REQUEST, getWinners, api),

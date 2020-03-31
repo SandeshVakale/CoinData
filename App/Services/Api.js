@@ -1,7 +1,6 @@
 // a library to wrap and simplify api calls
 import apisauce from 'apisauce'
 import Config from '../Config/AppConfig'
-import { ap } from 'ramda'
 
 // our "constructor"
 const create = (baseURL = Config.BASE_URL) => {

@@ -236,6 +236,23 @@ class LaunchScreen extends Component {
               width: '80%',
               alignSelf: 'center',
             }} title={'Know More about ' + graphData.name} titleStyle={{ color: colors.silver, fontWeight: 'bold' }}/>}
+
+            <Button icon={<Icon
+              style={{ paddingRight: 10 }}
+              name="home"
+              size={22}
+              color={colors.silver}
+            />}
+              onPress={() => this.props.navigation.navigate('postStack')} buttonStyle={{
+              backgroundColor: colors.transparent,
+              borderColor: colors.transparent,
+              borderWidth: 2,
+              marginVertical: 10,
+              paddingHorizontal: 30,
+              width: '80%',
+              alignSelf: 'center',
+            }} title={'Get Started'} titleStyle={{ color: colors.silver, fontWeight: 'bold' }}/>
+
             {graphData && stats.fetching === false &&
             <Overlay height={450} width={'95%'} isVisible={this.state.isVisible}
                      onBackdropPress={() => this.setState({ isVisible: false })}>
