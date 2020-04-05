@@ -8,12 +8,15 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { Colors } from '../Themes'
 
+
 const Tab = createBottomTabNavigator()
 
-export default function BottomTabNavigation () {
+export default function BottomTabNavigation (props) {
   return (
     <NavigationContainer>
-      <Tab.Navigator screenOptions={({ route }) => ({
+      <Tab.Navigator
+        screenProps={props}
+        screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName
 

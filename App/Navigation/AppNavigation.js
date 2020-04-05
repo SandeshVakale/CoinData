@@ -1,11 +1,9 @@
 import { createAppContainer } from 'react-navigation'
-import DetailScreen from '../Containers/DetailScreen'
 import { createStackNavigator } from 'react-navigation-stack'
-import LaunchScreen from '../Containers/LaunchScreen'
 import {Animated, Easing} from 'react-native'
 import BottomTabNavigation from './BottomTabNavigaton'
+import InititalStack from './StackNavigator'
 
-import styles from './Styles/NavigationStyles'
 const noTransitionConfig = () => ({
   transitionSpec: {
     duration: 0,
@@ -13,19 +11,6 @@ const noTransitionConfig = () => ({
     easing: Easing.step0,
   },
 });
-// Manifest of possible screens
-const InititalStack = createStackNavigator({
-  DetailScreen: { screen: DetailScreen },
-  LaunchScreen: { screen: LaunchScreen }
-}, {
-  // Default config for all screens
-  headerMode: 'none',
-  initialRouteName: 'LaunchScreen',
-  transitionConfig: noTransitionConfig,
-  navigationOptions: {
-    headerStyle: styles.header
-  }
-})
 
 const PrimaryNav = createStackNavigator(
   {

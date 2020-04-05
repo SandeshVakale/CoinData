@@ -47,7 +47,7 @@ class LaunchScreen extends Component {
   componentDidMount () {
     const { base, timePeriod } = this.state
     const { coinsRequest, globalStatsRequest, winnersRequest, losersRequest } = this.props
-    coinsRequest(base, timePeriod, null, null, 50, null)
+    coinsRequest(base, timePeriod, null, null, 100, null)
     winnersRequest(base, timePeriod, 'change', 10, 'desc')
     losersRequest(base, timePeriod, 'change', 10, 'asc')
     globalStatsRequest(base)
@@ -57,7 +57,7 @@ class LaunchScreen extends Component {
     const { base, refresh } = this.state
     const { coinsRequest, winnersRequest, losersRequest } = this.props
     this.setState({ timePeriod: item.item, refresh: !refresh })
-    coinsRequest(base, item.item, null, null, 50, null)
+    coinsRequest(base, item.item, null, null, 100, null)
     winnersRequest(base, item.item, 'change', 10, 'desc')
     losersRequest(base, item.item, 'change', 10, 'asc')
   }
@@ -67,7 +67,7 @@ class LaunchScreen extends Component {
     const { coinsRequest, globalStatsRequest, winnersRequest, losersRequest } = this.props
     this.setState({ base: item.item, refresh: !refresh })
     //console.log('item', item)
-    coinsRequest(item.item, timePeriod, null, null, 50, null)
+    coinsRequest(item.item, timePeriod, null, null, 100, null)
     globalStatsRequest(item.item)
     winnersRequest(item.item, timePeriod, 'change', 10, 'desc')
     losersRequest(item.item, timePeriod, 'change', 10, 'asc')
@@ -88,7 +88,7 @@ class LaunchScreen extends Component {
     if (graphData === null && coins.fetching === false && coins.payload !== null) {
       this.setState({ graphData: coins.payload.data.coins[0] })
     }
-    if (coins.fetching === false && winners.fetching === false && losers.fetching === false) {
+    if (coins.fetching === false && coins.payload !== null && winners.fetching === false && losers.fetching === false) {
       return (
         <View style={{ flex: 1, backgroundColor: graphData && graphData.color ? graphData.color : colors.bloodOrange }}>
           {graphData &&
