@@ -32,7 +32,8 @@ const bases = [
 class DetailScreen extends Component {
   constructor (props) {
     super(props)
-    const { id, base, timePeriod, color } = this.props.navigation.state.params
+    console.log('props', props)
+    const { id, base, timePeriod, color } = props.navigation.state ? props.navigation.state.params : props.route.params
     this.state = {
       id: id,
       base: base,
