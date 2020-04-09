@@ -9,7 +9,7 @@ import CoinActions from '../Redux/CoinRedux'
 import CoinHistoryActions from '../Redux/CoinHistoryRedux'
 import MarketActions from '../Redux/MarketsRedux'
 import ExchangesActions from '../Redux/ExchangesRedux'
-import { Button, Text, Header, Divider } from 'react-native-elements'
+import { Button, Text, Header, Divider, Image } from 'react-native-elements'
 import { DateAndTime } from '../Components/DateAndTime'
 import _ from 'lodash'
 
@@ -19,7 +19,7 @@ import colors from '../Themes/Colors'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { LineChart } from 'react-native-chart-kit'
 import { Colors } from '../Themes'
-import SvgUri from 'react-native-svg-uri'
+// import SvgUri from 'react-native-svg-uri'
 
 const timePeriods = [
   '24h', '7d', '30d', '1y', '5y',
@@ -76,8 +76,8 @@ class DetailScreen extends Component {
     // console.log('exchanges', exchanges)
     if (coin.fetching === false && markets.fetching === false && exchanges.fetching === false && exchanges.payload && exchanges.payload.data && markets.payload && markets.payload.data && coin.payload && coin.payload.data && coinHistory.fetching === false) {
       let data = coin.payload.data.coin
-      let history = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.price}) : []
-      let labels = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.timestamp}) : []
+      let history = coinHistory && coinHistory.payload && coinHistory.payload.data && !coinHistory.payload.data.history.includes(null) ? [...coinHistory.payload.data.history].map((i) => { return i.price}) : []
+      let labels = coinHistory && coinHistory.payload && coinHistory.payload.data && !coinHistory.payload.data.history.includes(null) ? [...coinHistory.payload.data.history].map((i) => { return i.timestamp}) : []
       // console.log('labels', labels)
       let AllTimeHigh = new Date(data.allTimeHigh.timestamp)
       let FirstSeen = new Date(data.firstSeen)
@@ -114,7 +114,7 @@ class DetailScreen extends Component {
               </View>
             </View>
             <View style={{ alignItems: 'center' }}>
-              {data && <LineChart
+              {data && history.length > 0 && <LineChart
                 data={{
                   datasets: [
                     {
@@ -168,7 +168,7 @@ class DetailScreen extends Component {
               hideStatusBar={true}
               titleStyle={{ fontWeight: 'bold' }}
             />
-            <View style={{ height: 100, alignItems: 'center', marginTop: -100 }}>
+            {history.length > 0 && <View style={{ height: 100, alignItems: 'center', marginTop: -100 }}>
               <FlatList data={timePeriods} horizontal extraData={refresh}
                         style={{ height: 50 }}
                         showsHorizontalScrollIndicator={false}
@@ -183,7 +183,7 @@ class DetailScreen extends Component {
                           buttonStyle={timePeriod === item.item ? styles.active : styles.deactive}
                           title={(item.item).toUpperCase()}/>
                         }/>
-            </View>
+            </View>}
 
             <View style={{ height: 100, alignItems: 'center', marginTop: -10 }}>
               <FlatList data={bases} horizontal extraData={refresh}
@@ -220,12 +220,13 @@ class DetailScreen extends Component {
                   }}>{AllTimeHigh.getDate() + '/' + (AllTimeHigh.getMonth() + 1) + '/' + AllTimeHigh.getFullYear()}</Text>
                 </View>
               </View>
-              <SvgUri
-                style={{ flex: 0.5, alignItems: 'center' }}
-                width={60}
-                height={60}
-                source={{ uri: data.iconUrl }}
-              />
+              <View style={{flex: 0.2, alignItems: 'center'}}>
+                <Image
+                  source={{ uri: data.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                  style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                  PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                />
+              </View>
             </View>
             <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>About {data.name}</Text>
             <Text style={{
@@ -398,7 +399,7 @@ class DetailScreen extends Component {
               }}>{data.rank}</Text>
             </View>
             <Divider style={{ backgroundColor: colors.silver }}/>
-            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Links</Text>
+            {data.links.length > 0 && <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Links</Text>}
             <FlatList data={data.links}
                       showsHorizontalScrollIndicator={false} style={{ paddingBottom: 15 }} horizontal
                       renderItem={(item) => <Button
@@ -415,7 +416,7 @@ class DetailScreen extends Component {
                         titleStyle={{ color: color }}/>
                       }/>
             <Divider style={{ backgroundColor: colors.silver }}/>
-            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Socials</Text>
+            {data.socials.length > 0 && <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Socials</Text>}
             <FlatList data={data.socials}
                       showsHorizontalScrollIndicator={false} style={{ paddingBottom: 15 }} horizontal
                       renderItem={(item) => <Button
@@ -438,12 +439,13 @@ class DetailScreen extends Component {
                       contentContainerStyle={{ paddingBottom: 15 }}
                       renderItem={
               (item) => <View style={{ flexDirection: 'row', padding: 5, borderWidth: 1, margin: 5, borderColor: colors.silver, borderRadius: 12}} >
-                <SvgUri
-                  style={{ paddingRight: 5, flex: 0.2, alignItems: 'center'}}
-                  width={40}
-                  height={40}
-                  source={{ uri: item.item.sourceIconUrl }}
-                />
+                <View style={{flex: 0.2, alignItems: 'center'}}>
+                  <Image
+                    source={{ uri: item.item.sourceIconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                    style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                    PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                  />
+                </View>
                 <View style={{ flex: 0.5, flexDirection: 'column' }}>
                   <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >{item.item.baseSymbol}/{item.item.quoteSymbol}</Text>
                   <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >{item.item.sourceName}</Text>
@@ -461,12 +463,13 @@ class DetailScreen extends Component {
                       contentContainerStyle={{ paddingBottom: 15 }}
                       renderItem={
                         (item) => <View style={{ flexDirection: 'row', padding: 5, borderWidth: 1, margin: 5, borderColor: colors.silver, borderRadius: 12}} >
-                          <SvgUri
-                            style={{ paddingRight: 5, flex: 0.2, alignItems: 'center'}}
-                            width={40}
-                            height={40}
-                            source={{ uri: item.item.iconUrl }}
-                          />
+                          <View style={{flex: 0.2, alignItems: 'center'}}>
+                            <Image
+                              source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                              style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                              PlaceholderContent={<ActivityIndicator style={{backgroundColor: colors.transparent}}/>}
+                            />
+                          </View>
                           <View style={{ flex: 0.5, flexDirection: 'column' }}>
                             <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >{item.item.name}</Text>
                             <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >Markets {item.item.numberOfMarkets}</Text>
@@ -482,7 +485,7 @@ class DetailScreen extends Component {
         </View>
       )
     } else {
-      let data = coin.payload && coin.payload.data && coin.payload.data.coin
+      // let data = coin.payload && coin.payload.data && coin.payload.data.coin
       return (
         <View style={{
           flex: 1,

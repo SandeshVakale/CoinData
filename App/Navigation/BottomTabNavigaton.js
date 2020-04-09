@@ -1,12 +1,12 @@
 import * as React from 'react'
 import FavoritesScreen from '../Containers/FavoritesScreen'
-import ExchangesScreen from '../Containers/ExchangesScreen'
 import MarketsScreen from '../Containers/MarketsScreen'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { Colors } from '../Themes'
 import CoinToDetailNavigator from './CoinToDetailNavigator'
+import ExchangeToDetailNavigator from './ExchangeToDetailNavigator'
 
 const Tab = createBottomTabNavigator()
 
@@ -40,7 +40,7 @@ export default function BottomTabNavigation (props) {
                        inactiveTintColor: Colors.charcoal
                      }}>
         <Tab.Screen name="Coins" component={CoinToDetailNavigator}/>
-        <Tab.Screen name="Exchanges" component={ExchangesScreen}/>
+        <Tab.Screen name="Exchanges" component={ExchangeToDetailNavigator}/>
         <Tab.Screen name="Markets" component={MarketsScreen}/>
         <Tab.Screen name="Favorites" component={FavoritesScreen}/>
       </Tab.Navigator>

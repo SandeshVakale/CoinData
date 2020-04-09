@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { FlatList, View, Dimensions, ActivityIndicator, ScrollView, Linking, TouchableHighlight } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { Colors } from '../Themes'
-import { Button, Text, Header, Overlay, Divider } from 'react-native-elements'
+import { Button, Text, Header, Overlay, Divider, Image } from 'react-native-elements'
 import { connect } from 'react-redux'
 import CoinsActions from '../Redux/CoinsRedux'
 import GlobalStatsActions from '../Redux/GlobalStatsRedux'
@@ -415,12 +415,13 @@ class LaunchScreen extends Component {
                               alignItems: 'center',
                               alignContent: 'center',
                             }}>
-                              <SvgUri
-                                style={{ paddingRight: 5, flex: 0.5, alignItems: 'center'}}
-                                width={40}
-                                height={40}
-                                source={{ uri: item.item.iconUrl }}
-                              />
+                              <View style={{flex: 0.2, alignItems: 'center'}}>
+                                <Image
+                                  source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                                  style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                                  PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                                />
+                              </View>
                               <View style={{
                                 flexDirection: 'column',
                                 justifyContent: 'space-around',
@@ -481,12 +482,13 @@ class LaunchScreen extends Component {
                               alignItems: 'center',
                               alignContent: 'center',
                             }}>
-                              <SvgUri
-                                style={{ paddingRight: 5, flex: 0.5, alignItems: 'center'}}
-                                width={40}
-                                height={40}
-                                source={{ uri: item.item.iconUrl }}
-                              />
+                              <View style={{flex: 0.5, alignItems: 'center'}}>
+                                <Image
+                                  source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                                  style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                                  PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                                />
+                              </View>
                               <View style={{
                                 flexDirection: 'column',
                                 justifyContent: 'space-around',
@@ -531,12 +533,13 @@ class LaunchScreen extends Component {
 const svgBloack = (data) => {
   return (
     <View style={{ paddingTop: 10, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-      <SvgUri
-        style={{ flex: 0.5, alignItems: 'center' }}
-        width={60}
-        height={60}
-        source={{ uri: data.iconUrl }}
-      />
+      <View style={{flex: 0.5, alignItems: 'center'}}>
+        <Image
+          source={{ uri: data.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+          style={{ width: 60, height: 60, resizeMode: 'contain' }}
+          PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+        />
+      </View>
       <Text h4 h4Style={{ fontWeight: 'bold', color: colors.silver, flex: 0.5, textAlign: 'center' }}>{data.name}</Text>
     </View>
   )

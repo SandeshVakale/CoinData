@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import { View, FlatList, TouchableHighlight } from 'react-native'
+import { View, FlatList, TouchableHighlight, ActivityIndicator } from 'react-native'
 import { connect } from 'react-redux'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
-import { Text, Header, Overlay } from 'react-native-elements'
+import { Text, Header, Overlay, Image } from 'react-native-elements'
 
 // Styles
 import colors from '../Themes/Colors'
@@ -11,7 +11,7 @@ import { DateAndTime } from '../Components/DateAndTime'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 import { Colors } from '../Themes'
-import SvgUri from 'react-native-svg-uri'
+// import SvgUri from 'react-native-svg-uri'
 import { LineChart } from 'react-native-chart-kit'
 import CoinsActions from '../Redux/CoinsRedux'
 import GlobalStatsActions from '../Redux/GlobalStatsRedux'
@@ -22,20 +22,25 @@ class CoinsScreen extends Component {
     this.state = {
       isVisible: false,
       base: 'USD',
-      timePeriod: '24h'
+      timePeriod: '24h',
+      refresh: true
     }
   }
 
   // componentDidMount () {
-  //   const { base, timePeriod } = this.state
-  //   const { coinsRequest, globalStatsRequest } = this.props
-  //   coinsRequest(base, timePeriod, null, null, 100, null)
-  //   globalStatsRequest(base)
+  //   // const { base, timePeriod } = this.state
+  //   // const { coinsRequest, globalStatsRequest } = this.props
+  //   // coinsRequest(base, timePeriod, null, null, 100, null)
+  //   // globalStatsRequest(base)
   // }
+
+  componentDidMount() {
+    const { refresh } = this.state
+    setTimeout(() => this.setState({refresh: !refresh}), 3000);
+  }
   render () {
-    const { base, timePeriod } = this.state
+    const { base, timePeriod, refresh } = this.state
     const { stats, coins } = this.props
-    console.log('this props', this.props)
     return (
       <View style={{ flex: 1, backgroundColor: colors.silver }}>
         <Header containerStyle={{ backgroundColor: colors.bloodOrange }}
@@ -49,6 +54,7 @@ class CoinsScreen extends Component {
           color={colors.silver}
           onPress={() => this.setState({ isVisible: true })}/>}/>
         <FlatList data={coins.payload.data.coins}
+                  extraData={refresh}
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={{borderColor: Colors.coal, backgroundColor: colors.silver }}
                   renderItem={
@@ -61,12 +67,13 @@ class CoinsScreen extends Component {
                         color: item.item.color,
                       },
                     )}><View style={{ flexDirection: 'row', alignItems: 'center', padding: 3, borderWidth: 1, margin: 5, borderColor: item.item.color, borderRadius: 12}} >
-                      <SvgUri
-                        style={{ paddingRight: 5, flex: 0.2, alignItems: 'center'}}
-                        width={40}
-                        height={40}
-                        source={{ uri: item.item.iconUrl }}
-                      />
+                      <View style={{flex: 0.2, alignItems: 'center'}}>
+                        <Image
+                          source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                          style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                          PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.silver }}/>}
+                        />
+                      </View>
                       <View style={{ flex: 0.25, flexDirection: 'column', zIndex: 10 }}>
                         <Text numberOfLines={1} style={{ fontSize: 14, fontWeight: 'bold', color: colors.bloodOrange }} >{item.item.name}</Text>
                         <Text style={{ fontSize: 18, fontWeight: 'bold', color: item.item.color }} >{item.item.symbol}</Text>
