@@ -4,7 +4,7 @@ import Immutable from 'seamless-immutable'
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-  exchangeRequest: ['data'],
+  exchangeRequest: ['limit'],
   exchangeSuccess: ['payload'],
   exchangeFailure: null
 })

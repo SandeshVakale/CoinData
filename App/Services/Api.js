@@ -47,7 +47,7 @@ const create = (baseURL = Config.BASE_URL) => {
   const getMarkets = ({ refCurrencyId, baseCurrencyId, limit }) => api.get('/markets', {refCurrencyId, baseCurrencyId, limit})
   const getExchanges = ({ refCurrencyId, limit }) => api.get('/exchanges', { refCurrencyId, limit })
   const getExchange = ({ limit }) => api.get('./exchanges', { limit })
-  const getMarket = ({ limit }) => api.get('./markets', limit)
+  const getMarket = ({ limit }) => api.get('./markets', { limit })
 
   // ------
   // STEP 3

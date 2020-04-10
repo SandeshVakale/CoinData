@@ -15,11 +15,11 @@ import ExchangeActions from '../Redux/ExchangeRedux'
 // import { ExchangeSelectors } from '../Redux/ExchangeRedux'
 
 export function * getExchange (api, action) {
-  const { data } = action
+  const { limit } = action
   // get current data from Store
   // const currentData = yield select(ExchangeSelectors.getData)
   // make the call to the api
-  const response = yield call(api.getExchange, data)
+  const response = yield call(api.getExchange, {limit})
 
   // success?
   if (response.ok) {

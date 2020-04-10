@@ -15,6 +15,7 @@ import { Colors } from '../Themes'
 import { LineChart } from 'react-native-chart-kit'
 import CoinsActions from '../Redux/CoinsRedux'
 import GlobalStatsActions from '../Redux/GlobalStatsRedux'
+import FavoritesActions from '../Redux/FavoritesRedux'
 
 class CoinsScreen extends Component {
   constructor (props) {
@@ -23,24 +24,25 @@ class CoinsScreen extends Component {
       isVisible: false,
       base: 'USD',
       timePeriod: '24h',
-      refresh: true
     }
   }
 
-  // componentDidMount () {
-  //   // const { base, timePeriod } = this.state
-  //   // const { coinsRequest, globalStatsRequest } = this.props
-  //   // coinsRequest(base, timePeriod, null, null, 100, null)
-  //   // globalStatsRequest(base)
-  // }
-
-  componentDidMount() {
-    const { refresh } = this.state
-    setTimeout(() => this.setState({refresh: !refresh}), 3000);
+  containsFavorites (id) {
+    const { favorites } = this.props
+    let i;
+    if ( favorites && favorites.favorites ) {
+      for (i = 0; i < favorites.favorites.length; i++) {
+        if (favorites.favorites[i].id === id) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
+
   render () {
-    const { base, timePeriod, refresh } = this.state
-    const { stats, coins } = this.props
+    const { base, timePeriod } = this.state
+    const { stats, coins, addFavorite, removeFavorite } = this.props
     return (
       <View style={{ flex: 1, backgroundColor: colors.silver }}>
         <Header containerStyle={{ backgroundColor: colors.bloodOrange }}
@@ -54,7 +56,7 @@ class CoinsScreen extends Component {
           color={colors.silver}
           onPress={() => this.setState({ isVisible: true })}/>}/>
         <FlatList data={coins.payload.data.coins}
-                  extraData={refresh}
+                  initialNumToRender={20}
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={{borderColor: Colors.coal, backgroundColor: colors.silver }}
                   renderItem={
@@ -66,13 +68,14 @@ class CoinsScreen extends Component {
                         timePeriod: timePeriod,
                         color: item.item.color,
                       },
-                    )}><View style={{ flexDirection: 'row', alignItems: 'center', padding: 3, borderWidth: 1, margin: 5, borderColor: item.item.color, borderRadius: 12}} >
-                      <View style={{flex: 0.2, alignItems: 'center'}}>
-                        <Image
+                    )}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 3, borderWidth: 1, margin: 5, borderColor: item.item.color, borderRadius: 12}} >
+                        <View style={{flex: 0.2, alignItems: 'center'}}>
+                        { item.item.iconUrl !== null && <Image
                           source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
                           style={{ width: 50, height: 50, resizeMode: 'contain' }}
-                          PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.silver }}/>}
-                        />
+                          PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                        /> }
                       </View>
                       <View style={{ flex: 0.25, flexDirection: 'column', zIndex: 10 }}>
                         <Text numberOfLines={1} style={{ fontSize: 14, fontWeight: 'bold', color: colors.bloodOrange }} >{item.item.name}</Text>
@@ -111,6 +114,9 @@ class CoinsScreen extends Component {
                         <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.bloodOrange }} >{coins.payload.data.base.sign} {_.ceil(item.item.price, 2)}</Text>
                         <Text style={{ fontSize: 18, fontWeight: 'bold', color: Math.sign(item.item.change) === -1 ? colors.error : colors.lightgreen, flex: 0.3 }} >{item.item.change}%</Text>
                       </View>
+                        <TouchableHighlight onPress={() => {this.containsFavorites(item.item.id) ? removeFavorite(item.item.id) : addFavorite(item.item.id)}} style={{ backgroundColor: colors.transparent, position: 'absolute', bottom: 5, right: 3 }}>
+                          <Icon color={colors.bloodOrange} size={25} name={this.containsFavorites(item.item.id) ? 'star' : 'star-outline'} />
+                        </TouchableHighlight>
                     </View>
                     </TouchableHighlight>
                   }/>
@@ -242,14 +248,17 @@ class CoinsScreen extends Component {
 const mapStateToProps = (state) => {
   return {
     stats: state.stats,
-    coins: state.coins
+    coins: state.coins,
+    favorites: state.favorites
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     coinsRequest: (base, timePeriod, ids, sort, limit, order) => dispatch(CoinsActions.coinsRequest(base, timePeriod, ids, sort, limit, order)),
-    globalStatsRequest: (base) => dispatch(GlobalStatsActions.globalStatsRequest(base))
+    globalStatsRequest: (base) => dispatch(GlobalStatsActions.globalStatsRequest(base)),
+    addFavorite: (id) => dispatch(FavoritesActions.addFavorite(id)),
+    removeFavorite: (id) => dispatch(FavoritesActions.removeFavorite(id))
   }
 }
 

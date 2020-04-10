@@ -15,11 +15,11 @@ import MarketActions from '../Redux/MarketRedux'
 // import { MarketSelectors } from '../Redux/MarketRedux'
 
 export function * getMarket (api, action) {
-  const { data } = action
+  const { limit } = action
   // get current data from Store
   // const currentData = yield select(MarketSelectors.getData)
   // make the call to the api
-  const response = yield call(api.getMarket, data)
+  const response = yield call(api.getMarket, { limit })
 
   // success?
   if (response.ok) {

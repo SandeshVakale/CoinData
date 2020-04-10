@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, ActivityIndicator, Dimensions, FlatList, ScrollView, Linking } from 'react-native'
+import { View, ActivityIndicator, Dimensions, FlatList, ScrollView, Linking, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
@@ -9,6 +9,7 @@ import CoinActions from '../Redux/CoinRedux'
 import CoinHistoryActions from '../Redux/CoinHistoryRedux'
 import MarketActions from '../Redux/MarketsRedux'
 import ExchangesActions from '../Redux/ExchangesRedux'
+import FavoritesActions from '../Redux/FavoritesRedux'
 import { Button, Text, Header, Divider, Image } from 'react-native-elements'
 import { DateAndTime } from '../Components/DateAndTime'
 import _ from 'lodash'
@@ -40,17 +41,50 @@ class DetailScreen extends Component {
       timePeriod: timePeriod,
       color: color,
       refresh: false,
+      iconFavorites: 'star-outline'
+    }
+    this._changeState = this._changeState.bind(this)
+  }
+
+  _changeState () {
+    const {addFavorite, removeFavorite, favorites} = this.props
+    const {id} = this.state
+    if (favorites !== undefined && favorites.favorites) {
+      const value = favorites.favorites.find((i) => {
+        return i.id === id
+      })
+      if (value !== undefined && value.id === id) {
+        this.setState({iconFavorites: 'star-outline'})
+        removeFavorite(id)
+      } else {
+        this.setState({iconFavorites: 'star'})
+        addFavorite(id)
+      }
+    } else {
+      this.setState({iconFavorites: 'star'})
+      addFavorite(id)
     }
   }
 
+
   componentDidMount () {
-    const { coinRequest, coinHistoryRequest, marketsRequest, exchangesRequest } = this.props
+    const { coinRequest, coinHistoryRequest, marketsRequest, exchangesRequest, favorites } = this.props
     const { base, timePeriod, id } = this.state
     // console.log('this.props', this.props)
     coinRequest(id, base, timePeriod)
     coinHistoryRequest(id, timePeriod, base)
     marketsRequest(null, id, 10)
     exchangesRequest(id, 10)
+    if (favorites !== undefined && favorites.favorites) {
+      const value = favorites.favorites.find((i) => {
+        return i.id === id
+      })
+      if (value !== undefined && value.id === id) {
+        this.setState({iconFavorites: 'star'})
+      } else {
+        this.setState({iconFavorites: 'star-outline'})
+      }
+    }
   }
 
   reload = (item) => {
@@ -72,7 +106,7 @@ class DetailScreen extends Component {
 
   render () {
     const { coin, coinHistory, markets, exchanges } = this.props
-    const { color, base, timePeriod, refresh } = this.state
+    const { color, base, timePeriod, refresh, iconFavorites } = this.state
     // console.log('exchanges', exchanges)
     if (coin.fetching === false && markets.fetching === false && exchanges.fetching === false && exchanges.payload && exchanges.payload.data && markets.payload && markets.payload.data && coin.payload && coin.payload.data && coinHistory.fetching === false) {
       let data = coin.payload.data.coin
@@ -96,7 +130,8 @@ class DetailScreen extends Component {
                   }}/>
           <ScrollView showsVerticalScrollIndicator={false}
                       style={{ backgroundColor: color ? color : colors.bloodOrange }}>
-            <View style={{ padding: 10 }}>
+            <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'column' }}>
               <Text
                 style={{ fontSize: 18, backgroundColor: color, fontWeight: 'bold', color: colors.silver }}>Price</Text>
               <View style={{ backgroundColor: color, flexDirection: 'row', alignItems: 'center' }}>
@@ -112,6 +147,16 @@ class DetailScreen extends Component {
                   paddingLeft: 15,
                 }}>{data.change}%</Text>
               </View>
+              </View>
+                <TouchableOpacity
+                  style={{ backgroundColor: colors.transparent, padding: 2 }}
+                  onPress={() => this._changeState()} >
+                  <Icon
+                    color={colors.silver}
+                    size={35}
+                    name={iconFavorites}
+                  />
+                </TouchableOpacity>
             </View>
             <View style={{ alignItems: 'center' }}>
               {data && history.length > 0 && <LineChart
@@ -220,12 +265,12 @@ class DetailScreen extends Component {
                   }}>{AllTimeHigh.getDate() + '/' + (AllTimeHigh.getMonth() + 1) + '/' + AllTimeHigh.getFullYear()}</Text>
                 </View>
               </View>
-              <View style={{flex: 0.2, alignItems: 'center'}}>
-                <Image
+              <View style={{flex: 0.2, alignItems: 'flex-end'}}>
+                {data.iconUrl !== null && <Image
                   source={{ uri: data.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
-                  style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                  style={{ width: 90, height: 90, resizeMode: 'contain' }}
                   PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
-                />
+                />}
               </View>
             </View>
             <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>About {data.name}</Text>
@@ -440,11 +485,11 @@ class DetailScreen extends Component {
                       renderItem={
               (item) => <View style={{ flexDirection: 'row', padding: 5, borderWidth: 1, margin: 5, borderColor: colors.silver, borderRadius: 12}} >
                 <View style={{flex: 0.2, alignItems: 'center'}}>
-                  <Image
+                  {item.item.sourceIconUrl !== null && <Image
                     source={{ uri: item.item.sourceIconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
                     style={{ width: 50, height: 50, resizeMode: 'contain' }}
                     PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
-                  />
+                  />}
                 </View>
                 <View style={{ flex: 0.5, flexDirection: 'column' }}>
                   <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >{item.item.baseSymbol}/{item.item.quoteSymbol}</Text>
@@ -464,11 +509,11 @@ class DetailScreen extends Component {
                       renderItem={
                         (item) => <View style={{ flexDirection: 'row', padding: 5, borderWidth: 1, margin: 5, borderColor: colors.silver, borderRadius: 12}} >
                           <View style={{flex: 0.2, alignItems: 'center'}}>
-                            <Image
+                            {item.item.iconUrl !== null && <Image
                               source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
                               style={{ width: 50, height: 50, resizeMode: 'contain' }}
                               PlaceholderContent={<ActivityIndicator style={{backgroundColor: colors.transparent}}/>}
-                            />
+                            />}
                           </View>
                           <View style={{ flex: 0.5, flexDirection: 'column' }}>
                             <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >{item.item.name}</Text>
@@ -505,7 +550,8 @@ const mapStateToProps = (state) => {
     coin: state.coin,
     coinHistory: state.coinHistory,
     markets: state.markets,
-    exchanges: state.exchanges
+    exchanges: state.exchanges,
+    favorites: state.favorites
   }
 }
 
@@ -514,7 +560,9 @@ const mapDispatchToProps = (dispatch) => {
     coinRequest: (coin_id, base, timePeriod) => dispatch(CoinActions.coinRequest(coin_id, base, timePeriod)),
     coinHistoryRequest: (coin_id, timePeriod, base) => dispatch(CoinHistoryActions.coinHistoryRequest(coin_id, timePeriod, base)),
     marketsRequest: (refCurrencyId, baseCurrencyId, limit) => dispatch(MarketActions.marketsRequest(refCurrencyId, baseCurrencyId, limit)),
-    exchangesRequest: (refCurrencyId, limit) => dispatch(ExchangesActions.exchangesRequest(refCurrencyId, limit))
+    exchangesRequest: (refCurrencyId, limit) => dispatch(ExchangesActions.exchangesRequest(refCurrencyId, limit)),
+    addFavorite: (id) => dispatch(FavoritesActions.addFavorite(id)),
+    removeFavorite: (id) => dispatch(FavoritesActions.removeFavorite(id))
   }
 }
 

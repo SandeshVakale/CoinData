@@ -76,7 +76,7 @@ class LaunchScreen extends Component {
   componentDidUpdate (prevProps) {
     const { coins } = this.props
     const { active } = this.state
-    if (!_.isEqual(coins, prevProps.coins) && coins.fetching === false) {
+    if (!_.isEqual(coins, prevProps.coins) && coins.fetching === false && coins.payload !== null) {
       this.setState({ graphData: coins.payload.data.coins[active] })
     }
   }
@@ -88,7 +88,7 @@ class LaunchScreen extends Component {
     if (graphData === null && coins.fetching === false && coins.payload !== null) {
       this.setState({ graphData: coins.payload.data.coins[0] })
     }
-    if (coins.fetching === false && coins.payload !== null && winners.fetching === false && losers.fetching === false) {
+    if (coins.fetching === false && coins.payload !== null && winners.fetching === false && winners.payload !== null && losers.fetching === false && losers.payload !== null) {
       return (
         <View style={{ flex: 1, backgroundColor: graphData && graphData.color ? graphData.color : colors.bloodOrange }}>
           {graphData &&
@@ -398,8 +398,8 @@ class LaunchScreen extends Component {
                             alignItems: 'center',
                             alignContent: 'center',
                             height: 100,
-                            width: 200,
-                            marginHorizontal: 10,
+                            width: 250,
+                            marginHorizontal: 2,
                             borderRadius: 12,
                             borderWidth: 2,
                             borderColor: colors.silver,
@@ -416,11 +416,11 @@ class LaunchScreen extends Component {
                               alignContent: 'center',
                             }}>
                               <View style={{flex: 0.2, alignItems: 'center'}}>
-                                <Image
+                                {item.item.iconUrl !== null && <Image
                                   source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
                                   style={{ width: 50, height: 50, resizeMode: 'contain' }}
                                   PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
-                                />
+                                />}
                               </View>
                               <View style={{
                                 flexDirection: 'column',
@@ -465,8 +465,8 @@ class LaunchScreen extends Component {
                             alignItems: 'center',
                             alignContent: 'center',
                             height: 100,
-                            width: 200,
-                            marginHorizontal: 10,
+                            width: 250,
+                            marginHorizontal: 2,
                             borderRadius: 12,
                             borderWidth: 2,
                             borderColor: colors.silver,
@@ -483,11 +483,11 @@ class LaunchScreen extends Component {
                               alignContent: 'center',
                             }}>
                               <View style={{flex: 0.5, alignItems: 'center'}}>
-                                <Image
+                                { item.item.iconUrl !== null && <Image
                                   source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
                                   style={{ width: 50, height: 50, resizeMode: 'contain' }}
                                   PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
-                                />
+                                /> }
                               </View>
                               <View style={{
                                 flexDirection: 'column',
@@ -534,11 +534,11 @@ const svgBloack = (data) => {
   return (
     <View style={{ paddingTop: 10, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
       <View style={{flex: 0.5, alignItems: 'center'}}>
-        <Image
+        { data.iconUrl !== null  && <Image
           source={{ uri: data.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
           style={{ width: 60, height: 60, resizeMode: 'contain' }}
           PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
-        />
+        />}
       </View>
       <Text h4 h4Style={{ fontWeight: 'bold', color: colors.silver, flex: 0.5, textAlign: 'center' }}>{data.name}</Text>
     </View>

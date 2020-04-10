@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 // import SvgUri from 'react-native-svg-uri'
 import ExchangeActions from '../Redux/ExchangeRedux'
+import FavoritesActions from '../Redux/FavoritesRedux'
 
 class ExchangesScreen extends Component {
   constructor (props) {
@@ -20,12 +21,25 @@ class ExchangesScreen extends Component {
     }
   }
 
+  containsFavorites (id) {
+    const { favorites } = this.props
+    let i;
+    if ( favorites && favorites.favorites ) {
+      for (i = 0; i < favorites.favorites.length; i++) {
+        if (favorites.favorites[i].id === id) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   componentDidMount () {
     const { exchangeRequest } = this.props
-    exchangeRequest(50)
+    exchangeRequest(100)
   }
   render () {
-    const { stats, coins, exchange } = this.props
+    const { stats, coins, exchange, addFavorite, removeFavorite } = this.props
     if (exchange.fetching === false && exchange.payload && exchange.payload.data) {
       return (
         <View style={{ flex: 1 }}>
@@ -42,6 +56,7 @@ class ExchangesScreen extends Component {
           <FlatList data={exchange.payload.data.exchanges}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ paddingBottom: 15 }}
+                    initialNumToRender={20}
                     renderItem={
                       (item) => <TouchableHighlight onPress={() => this.props.navigation.navigate(
                         'DetailScreen',
@@ -60,11 +75,11 @@ class ExchangesScreen extends Component {
                         borderRadius: 12
                       }}>
                         <View style={{flex: 0.2, alignItems: 'center'}}>
-                          <Image
+                          { item.item.iconUrl !== null && <Image
                             source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
                             style={{ width: 50, height: 50, resizeMode: 'contain' }}
                             PlaceholderContent={<ActivityIndicator style={{backgroundColor: colors.transparent}}/>}
-                          />
+                          />}
                         </View>
                         <View style={{ flex: 0.5, flexDirection: 'column' }}>
                           <Text
@@ -84,6 +99,9 @@ class ExchangesScreen extends Component {
                             flex: 0.3
                           }}>{_.ceil(item.item.marketShare, 5)}</Text>
                         </View>
+                        <TouchableHighlight onPress={() => {this.containsFavorites(item.item.id) ? removeFavorite(item.item.id) : addFavorite(item.item.id)}} style={{ backgroundColor: colors.transparent, position: 'absolute', bottom: 5, right: 3 }}>
+                          <Icon color={colors.bloodOrange} size={25} name={this.containsFavorites(item.item.id) ? 'star' : 'star-outline'} />
+                        </TouchableHighlight>
                       </View>
                       </TouchableHighlight>
                     }/>
@@ -229,13 +247,16 @@ const mapStateToProps = (state) => {
   return {
     stats: state.stats,
     coins: state.coins,
-    exchange: state.exchange
+    exchange: state.exchange,
+    favorites: state.favorites
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    exchangeRequest: (limit) => dispatch(ExchangeActions.exchangeRequest(limit))
+    exchangeRequest: (limit) => dispatch(ExchangeActions.exchangeRequest(limit)),
+    addFavorite: (id) => dispatch(FavoritesActions.addFavorite(id)),
+    removeFavorite: (id) => dispatch(FavoritesActions.removeFavorite(id))
   }
 }
 
