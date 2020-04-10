@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, ActivityIndicator, Dimensions, FlatList, ScrollView, Linking } from 'react-native'
+import { View, ActivityIndicator, Dimensions, FlatList, ScrollView, Linking, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
@@ -8,7 +8,9 @@ import FlashMessage, { showMessage } from 'react-native-flash-message'
 import CoinActions from '../Redux/CoinRedux'
 import CoinHistoryActions from '../Redux/CoinHistoryRedux'
 import MarketActions from '../Redux/MarketsRedux'
-import { Button, Text, Header, Divider } from 'react-native-elements'
+import ExchangesActions from '../Redux/ExchangesRedux'
+import FavoritesActions from '../Redux/FavoritesRedux'
+import { Button, Text, Header, Divider, Image } from 'react-native-elements'
 import { DateAndTime } from '../Components/DateAndTime'
 import _ from 'lodash'
 
@@ -18,8 +20,7 @@ import colors from '../Themes/Colors'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { LineChart } from 'react-native-chart-kit'
 import { Colors } from '../Themes'
-import SvgUri from 'react-native-svg-uri'
-import { T } from 'ramda'
+// import SvgUri from 'react-native-svg-uri'
 
 const timePeriods = [
   '24h', '7d', '30d', '1y', '5y',
@@ -32,23 +33,58 @@ const bases = [
 class DetailScreen extends Component {
   constructor (props) {
     super(props)
-    const { id, base, timePeriod, color } = this.props.navigation.state.params
+    console.log('props', props)
+    const { id, base, timePeriod, color } = props.navigation.state ? props.navigation.state.params : props.route.params
     this.state = {
       id: id,
       base: base,
       timePeriod: timePeriod,
       color: color,
       refresh: false,
+      iconFavorites: 'star-outline'
+    }
+    this._changeState = this._changeState.bind(this)
+  }
+
+  _changeState () {
+    const {addFavorite, removeFavorite, favorites} = this.props
+    const {id} = this.state
+    if (favorites !== undefined && favorites.favorites) {
+      const value = favorites.favorites.find((i) => {
+        return i.id === id
+      })
+      if (value !== undefined && value.id === id) {
+        this.setState({iconFavorites: 'star-outline'})
+        removeFavorite(id)
+      } else {
+        this.setState({iconFavorites: 'star'})
+        addFavorite(id)
+      }
+    } else {
+      this.setState({iconFavorites: 'star'})
+      addFavorite(id)
     }
   }
 
+
   componentDidMount () {
-    const { coinRequest, coinHistoryRequest, marketsRequest } = this.props
+    const { coinRequest, coinHistoryRequest, marketsRequest, exchangesRequest, favorites } = this.props
     const { base, timePeriod, id } = this.state
-    console.log('this.props', this.props)
+    // console.log('this.props', this.props)
     coinRequest(id, base, timePeriod)
     coinHistoryRequest(id, timePeriod, base)
     marketsRequest(null, id, 10)
+    exchangesRequest(id, 10)
+    if (favorites !== undefined && favorites.favorites) {
+      const value = favorites.favorites.find((i) => {
+        return i.id === id
+      })
+      if (value !== undefined && value.id === id) {
+        this.setState({iconFavorites: 'star'})
+      } else {
+        this.setState({iconFavorites: 'star-outline'})
+      }
+    }
   }
 
   reload = (item) => {
@@ -69,13 +105,13 @@ class DetailScreen extends Component {
   }
 
   render () {
-    const { coin, coinHistory, markets } = this.props
-    const { color, base, timePeriod, refresh } = this.state
-    // console.log('markets', markets)
-    if (coin.fetching === false && markets.fetching === false && markets.payload && markets.payload.data && coin.payload && coin.payload.data && coinHistory.fetching === false) {
+    const { coin, coinHistory, markets, exchanges } = this.props
+    const { color, base, timePeriod, refresh, iconFavorites } = this.state
+    // console.log('exchanges', exchanges)
+    if (coin.fetching === false && markets.fetching === false && exchanges.fetching === false && exchanges.payload && exchanges.payload.data && markets.payload && markets.payload.data && coin.payload && coin.payload.data && coinHistory.fetching === false) {
       let data = coin.payload.data.coin
-      let history = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.price}) : []
-      let labels = coinHistory && coinHistory.payload && coinHistory.payload.data ? [...coinHistory.payload.data.history].map((i) => { return i.timestamp}) : []
+      let history = coinHistory && coinHistory.payload && coinHistory.payload.data && !coinHistory.payload.data.history.includes(null) ? [...coinHistory.payload.data.history].map((i) => { return i.price}) : []
+      let labels = coinHistory && coinHistory.payload && coinHistory.payload.data && !coinHistory.payload.data.history.includes(null) ? [...coinHistory.payload.data.history].map((i) => { return i.timestamp}) : []
       // console.log('labels', labels)
       let AllTimeHigh = new Date(data.allTimeHigh.timestamp)
       let FirstSeen = new Date(data.firstSeen)
@@ -94,7 +130,8 @@ class DetailScreen extends Component {
                   }}/>
           <ScrollView showsVerticalScrollIndicator={false}
                       style={{ backgroundColor: color ? color : colors.bloodOrange }}>
-            <View style={{ padding: 10 }}>
+            <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'column' }}>
               <Text
                 style={{ fontSize: 18, backgroundColor: color, fontWeight: 'bold', color: colors.silver }}>Price</Text>
               <View style={{ backgroundColor: color, flexDirection: 'row', alignItems: 'center' }}>
@@ -110,9 +147,19 @@ class DetailScreen extends Component {
                   paddingLeft: 15,
                 }}>{data.change}%</Text>
               </View>
+              </View>
+                <TouchableOpacity
+                  style={{ backgroundColor: colors.transparent, padding: 2 }}
+                  onPress={() => this._changeState()} >
+                  <Icon
+                    color={colors.silver}
+                    size={35}
+                    name={iconFavorites}
+                  />
+                </TouchableOpacity>
             </View>
             <View style={{ alignItems: 'center' }}>
-              {data && <LineChart
+              {data && history.length > 0 && <LineChart
                 data={{
                   datasets: [
                     {
@@ -166,7 +213,7 @@ class DetailScreen extends Component {
               hideStatusBar={true}
               titleStyle={{ fontWeight: 'bold' }}
             />
-            <View style={{ height: 100, alignItems: 'center', marginTop: -100 }}>
+            {history.length > 0 && <View style={{ height: 100, alignItems: 'center', marginTop: -100 }}>
               <FlatList data={timePeriods} horizontal extraData={refresh}
                         style={{ height: 50 }}
                         showsHorizontalScrollIndicator={false}
@@ -181,7 +228,7 @@ class DetailScreen extends Component {
                           buttonStyle={timePeriod === item.item ? styles.active : styles.deactive}
                           title={(item.item).toUpperCase()}/>
                         }/>
-            </View>
+            </View>}
 
             <View style={{ height: 100, alignItems: 'center', marginTop: -10 }}>
               <FlatList data={bases} horizontal extraData={refresh}
@@ -218,12 +265,13 @@ class DetailScreen extends Component {
                   }}>{AllTimeHigh.getDate() + '/' + (AllTimeHigh.getMonth() + 1) + '/' + AllTimeHigh.getFullYear()}</Text>
                 </View>
               </View>
-              <SvgUri
-                style={{ flex: 0.5, alignItems: 'center' }}
-                width={60}
-                height={60}
-                source={{ uri: data.iconUrl }}
-              />
+              <View style={{flex: 0.2, alignItems: 'flex-end'}}>
+                {data.iconUrl !== null && <Image
+                  source={{ uri: data.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                  style={{ width: 90, height: 90, resizeMode: 'contain' }}
+                  PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                />}
+              </View>
             </View>
             <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>About {data.name}</Text>
             <Text style={{
@@ -396,7 +444,7 @@ class DetailScreen extends Component {
               }}>{data.rank}</Text>
             </View>
             <Divider style={{ backgroundColor: colors.silver }}/>
-            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Links</Text>
+            {data.links.length > 0 && <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Links</Text>}
             <FlatList data={data.links}
                       showsHorizontalScrollIndicator={false} style={{ paddingBottom: 15 }} horizontal
                       renderItem={(item) => <Button
@@ -413,7 +461,7 @@ class DetailScreen extends Component {
                         titleStyle={{ color: color }}/>
                       }/>
             <Divider style={{ backgroundColor: colors.silver }}/>
-            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Socials</Text>
+            {data.socials.length > 0 && <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Socials</Text>}
             <FlatList data={data.socials}
                       showsHorizontalScrollIndicator={false} style={{ paddingBottom: 15 }} horizontal
                       renderItem={(item) => <Button
@@ -433,15 +481,16 @@ class DetailScreen extends Component {
 
             <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Markets Containing {data.name}</Text>
             <FlatList data={markets.payload.data.markets}
-                      contentContainerStyle={{ paddingVertical: 15 }}
+                      contentContainerStyle={{ paddingBottom: 15 }}
                       renderItem={
               (item) => <View style={{ flexDirection: 'row', padding: 5, borderWidth: 1, margin: 5, borderColor: colors.silver, borderRadius: 12}} >
-                <SvgUri
-                  style={{ paddingRight: 5, flex: 0.2, alignItems: 'center'}}
-                  width={40}
-                  height={40}
-                  source={{ uri: item.item.sourceIconUrl }}
-                />
+                <View style={{flex: 0.2, alignItems: 'center'}}>
+                  {item.item.sourceIconUrl !== null && <Image
+                    source={{ uri: item.item.sourceIconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                    style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                    PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                  />}
+                </View>
                 <View style={{ flex: 0.5, flexDirection: 'column' }}>
                   <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >{item.item.baseSymbol}/{item.item.quoteSymbol}</Text>
                   <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >{item.item.sourceName}</Text>
@@ -453,11 +502,35 @@ class DetailScreen extends Component {
               </View>
             } />
             <Divider style={{ backgroundColor: colors.silver }}/>
+
+            <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Exchanges trading {data.name}</Text>
+            <FlatList data={exchanges.payload.data.exchanges}
+                      contentContainerStyle={{ paddingBottom: 15 }}
+                      renderItem={
+                        (item) => <View style={{ flexDirection: 'row', padding: 5, borderWidth: 1, margin: 5, borderColor: colors.silver, borderRadius: 12}} >
+                          <View style={{flex: 0.2, alignItems: 'center'}}>
+                            {item.item.iconUrl !== null && <Image
+                              source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                              style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                              PlaceholderContent={<ActivityIndicator style={{backgroundColor: colors.transparent}}/>}
+                            />}
+                          </View>
+                          <View style={{ flex: 0.5, flexDirection: 'column' }}>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >{item.item.name}</Text>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >Markets {item.item.numberOfMarkets}</Text>
+                          </View>
+                          <View style={{ flex: 0.3, flexDirection: 'column' }}>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver }} >Market Share</Text>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.silver, flex: 0.3 }} >{_.ceil(item.item.marketShare, 5)}</Text>
+                          </View>
+                        </View>
+                      } />
+            <Divider style={{ backgroundColor: colors.silver }}/>
           </ScrollView>
         </View>
       )
     } else {
-      let data = coin.payload && coin.payload.data && coin.payload.data.coin
+      // let data = coin.payload && coin.payload.data && coin.payload.data.coin
       return (
         <View style={{
           flex: 1,
@@ -476,7 +549,9 @@ const mapStateToProps = (state) => {
   return {
     coin: state.coin,
     coinHistory: state.coinHistory,
-    markets: state.markets
+    markets: state.markets,
+    exchanges: state.exchanges,
+    favorites: state.favorites
   }
 }
 
@@ -484,7 +559,10 @@ const mapDispatchToProps = (dispatch) => {
   return {
     coinRequest: (coin_id, base, timePeriod) => dispatch(CoinActions.coinRequest(coin_id, base, timePeriod)),
     coinHistoryRequest: (coin_id, timePeriod, base) => dispatch(CoinHistoryActions.coinHistoryRequest(coin_id, timePeriod, base)),
-    marketsRequest: (refCurrencyId, baseCurrencyId, limit) => dispatch(MarketActions.marketsRequest(refCurrencyId, baseCurrencyId, limit))
+    marketsRequest: (refCurrencyId, baseCurrencyId, limit) => dispatch(MarketActions.marketsRequest(refCurrencyId, baseCurrencyId, limit)),
+    exchangesRequest: (refCurrencyId, limit) => dispatch(ExchangesActions.exchangesRequest(refCurrencyId, limit)),
+    addFavorite: (id) => dispatch(FavoritesActions.addFavorite(id)),
+    removeFavorite: (id) => dispatch(FavoritesActions.removeFavorite(id))
   }
 }
 
