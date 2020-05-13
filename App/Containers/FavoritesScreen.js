@@ -13,74 +13,83 @@ import _ from 'lodash'
 import FavoritesCoinsActions from '../Redux/FavoritesCoinsRedux'
 import { Colors } from '../Themes'
 import { LineChart } from 'react-native-chart-kit'
+import FavoritesActions from '../Redux/FavoritesRedux'
 
 class FavoritesScreen extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      isVisible: false,
+      isVisible: false
     }
   }
   containsFavorites (id) {
     const { favorites } = this.props
-    let i;
-    if ( favorites && favorites.favorites ) {
+    let i
+    if (favorites && favorites.favorites) {
       for (i = 0; i < favorites.favorites.length; i++) {
         if (favorites.favorites[i].id === id) {
-          return true;
+          return true
         }
       }
     }
-    return false;
+    return false
   }
 
   componentDidMount () {
     const { favorites, favoritesCoinsRequest } = this.props
-      if (favorites && favorites.favorites && favorites.favorites.length > 0) {
-        let str = favorites.favorites.map((i) => i.id)
-        console.log('str', str)
-        console.log('str join', str.join(','))
-        // favoritesCoinsRequest(str.join(','))
-      }
+    if (favorites && favorites.favorites && favorites.favorites.length > 0) {
+      let str = favorites.favorites.map((i) => i.id)
+      favoritesCoinsRequest(str.join(','))
+    }
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const { favorites, favoritesCoinsRequest } = this.props
+    console.log('favorites', favorites.favorites, prevProps.favorites.favorites)
+    if (prevProps.favorites && prevProps.favorites.favorites && favorites && favorites.favorites && prevProps.favorites.favorites.length !== favorites.favorites.length) {
+      let str = favorites.favorites.map((i) => i.id)
+      favoritesCoinsRequest(str.join(','))
+    }
   }
 
   render () {
-    const { stats, coins, favoritesCoins, favorites } = this.props
-    console.log('favoritesCoins', favoritesCoins)
+    const { stats, coins, favoritesCoins, favorites, removeFavorite, addFavorite } = this.props
+    // console.log('favoritesCoins', favoritesCoins)
+    const { base, timePeriod } = this.state
     if (favorites && favorites.favorites && favorites.favorites.length > 0 && favoritesCoins && favoritesCoins.fetching === false && favoritesCoins.payload !== null && favoritesCoins.payload.data && favoritesCoins.payload.data.coins.length > 0) {
       return (
         <View style={{ flex: 1 }}>
           <Header containerStyle={{ backgroundColor: colors.bloodOrange }}
-                  rightComponent={<DateAndTime/>} centerComponent={{
-            text: 'Favorites',
-            style: { color: colors.silver, fontWeight: '900', fontSize: 28 },
-          }} leftComponent={<Icon
+            rightComponent={<DateAndTime />} centerComponent={{
+              text: 'Favorites',
+              style: { color: colors.silver, fontWeight: '900', fontSize: 28 }
+            }} leftComponent={<Icon
             // raised
-            name='earth'
-            size={34}
-            color={colors.silver}
-            onPress={() => this.setState({ isVisible: true })}/>}/>
+              name='earth'
+              size={34}
+              color={colors.silver}
+              onPress={() => this.setState({ isVisible: true })} />} />
           <FlatList data={favoritesCoins.payload.data.coins}
-                    //initialNumToRender={20}
-                    keyExtractor={(item, index) => index}
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{borderColor: Colors.coal, backgroundColor: colors.silver }}
-                    renderItem={
+                    // initialNumToRender={20}
+            keyExtractor={(item, index) => index}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{borderColor: Colors.coal, backgroundColor: colors.silver }}
+            renderItem={
                       (item) => <TouchableHighlight onPress={() => this.props.navigation.navigate(
                         'DetailScreen',
                         {
                           id: item.item.id,
                           base: base,
                           timePeriod: timePeriod,
-                          color: item.item.color,
-                        },
+                          color: item.item.color
+                        }
                       )}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', padding: 3, borderWidth: 1, margin: 5, borderColor: item.item.color, borderRadius: 12}} >
                           <View style={{flex: 0.2, alignItems: 'center'}}>
                             { item.item.iconUrl !== null && <Image
                               source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
                               style={{ width: 50, height: 50, resizeMode: 'contain' }}
-                              PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                              PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }} />}
                             /> }
                           </View>
                           <View style={{ flex: 0.25, flexDirection: 'column', zIndex: 10 }}>
@@ -93,9 +102,9 @@ class FavoritesScreen extends Component {
                                 // labels: timePeriod === '24h' ? hours : timePeriod === '7d' ? days7 : days30,
                                 datasets: [
                                   {
-                                    data: item.item.history,
-                                  },
-                                ],
+                                    data: item.item.history
+                                  }
+                                ]
                               }}
                               withInnerLines={false}
                               withDots={false}
@@ -111,7 +120,7 @@ class FavoritesScreen extends Component {
                                 backgroundGradientFrom: colors.silver,
                                 backgroundGradientTo: colors.silver,
                                 decimalPlaces: 2, // optional, defaults to 2dp
-                                color: (opacity = 1) => Math.sign(item.item.change) === -1 ? colors.error : colors.lightgreen,
+                                color: (opacity = 1) => Math.sign(item.item.change) === -1 ? colors.error : colors.lightgreen
                               }}
                               style={{alignItems: 'center', marginLeft: -100}}
                             />
@@ -120,37 +129,37 @@ class FavoritesScreen extends Component {
                             <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.bloodOrange }} >{coins.payload.data.base.sign} {_.ceil(item.item.price, 2)}</Text>
                             <Text style={{ fontSize: 18, fontWeight: 'bold', color: Math.sign(item.item.change) === -1 ? colors.error : colors.lightgreen, flex: 0.3 }} >{item.item.change}%</Text>
                           </View>
-                          <TouchableHighlight onPress={() => {this.containsFavorites(item.item.id) ? removeFavorite(item.item.id) : addFavorite(item.item.id)}} style={{ backgroundColor: colors.transparent, position: 'absolute', bottom: 5, right: 3 }}>
+                          <TouchableHighlight onPress={() => { this.containsFavorites(item.item.id) ? removeFavorite(item.item.id) : addFavorite(item.item.id) }} style={{ backgroundColor: colors.transparent, position: 'absolute', bottom: 5, right: 3 }}>
                             <Icon color={colors.bloodOrange} size={25} name={this.containsFavorites(item.item.id) ? 'star' : 'star-outline'} />
                           </TouchableHighlight>
                         </View>
                       </TouchableHighlight>
-                    }/>
+                    } />
           <Overlay height={450} width={'95%'} isVisible={this.state.isVisible}
-                   onBackdropPress={() => this.setState({ isVisible: false })}>
+            onBackdropPress={() => this.setState({ isVisible: false })}>
 
             <Text h2 h2Style={{
               color: colors.bloodOrange,
               textAlign: 'center',
-              fontWeight: '700',
+              fontWeight: '700'
             }}>Global Stats</Text>
             <View style={{
               flexDirection: 'column',
               justifyContent: 'space-around',
               flex: 1,
-              backgroundColor: colors.transparent,
+              backgroundColor: colors.transparent
             }}>
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 padding: 10,
-                backgroundColor: colors.transparent,
+                backgroundColor: colors.transparent
               }}>
                 <Text style={{
                   fontSize: 18,
                   color: colors.bloodOrange,
                   fontWeight: 'bold',
-                  flex: 0.5,
+                  flex: 0.5
                 }}>Totol Coins</Text>
                 <Text style={{
                   fontSize: 18,
@@ -158,20 +167,20 @@ class FavoritesScreen extends Component {
                   fontWeight: 'bold',
                   textAlign: 'right',
                   right: 0,
-                  flex: 0.5,
+                  flex: 0.5
                 }}>{stats.payload.data.totalCoins}</Text>
               </View>
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 padding: 10,
-                backgroundColor: colors.transparent,
+                backgroundColor: colors.transparent
               }}>
                 <Text style={{
                   fontSize: 18,
                   color: colors.bloodOrange,
                   fontWeight: 'bold',
-                  flex: 0.5,
+                  flex: 0.5
                 }}>Totol Markets</Text>
                 <Text style={{
                   fontSize: 18,
@@ -179,20 +188,20 @@ class FavoritesScreen extends Component {
                   fontWeight: 'bold',
                   textAlign: 'right',
                   right: 0,
-                  flex: 0.5,
+                  flex: 0.5
                 }}>{stats.payload.data.totalMarkets}</Text>
               </View>
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 backgroundColor: colors.transparent,
-                padding: 10,
+                padding: 10
               }}>
                 <Text style={{
                   fontSize: 18,
                   color: colors.bloodOrange,
                   fontWeight: 'bold',
-                  flex: 0.5,
+                  flex: 0.5
                 }}>Totol Exchanges</Text>
                 <Text style={{
                   fontSize: 18,
@@ -200,20 +209,20 @@ class FavoritesScreen extends Component {
                   fontWeight: 'bold',
                   textAlign: 'right',
                   right: 0,
-                  flex: 0.5,
+                  flex: 0.5
                 }}>{_.ceil(stats.payload.data.totalExchanges, 2)}</Text>
               </View>
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 backgroundColor: colors.transparent,
-                padding: 10,
+                padding: 10
               }}>
                 <Text style={{
                   fontSize: 18,
                   color: colors.bloodOrange,
                   fontWeight: 'bold',
-                  flex: 0.5,
+                  flex: 0.5
                 }}>Totol Market Cap</Text>
                 <Text style={{
                   fontSize: 18,
@@ -221,20 +230,20 @@ class FavoritesScreen extends Component {
                   fontWeight: 'bold',
                   textAlign: 'right',
                   right: 0,
-                  flex: 0.5,
+                  flex: 0.5
                 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
               </View>
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 backgroundColor: colors.transparent,
-                padding: 10,
+                padding: 10
               }}>
                 <Text style={{
                   fontSize: 18,
                   color: colors.bloodOrange,
                   fontWeight: 'bold',
-                  flex: 0.5,
+                  flex: 0.5
                 }}>Totol 24h Volume</Text>
                 <Text style={{
                   fontSize: 18,
@@ -242,7 +251,7 @@ class FavoritesScreen extends Component {
                   fontWeight: 'bold',
                   textAlign: 'right',
                   right: 0,
-                  flex: 0.5,
+                  flex: 0.5
                 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
               </View>
             </View>
@@ -255,30 +264,30 @@ class FavoritesScreen extends Component {
         <View>
           <Text style={{ textAlign: 'center' }}>Click on <Icon name={'star-outline'} color={colors.bloodOrange} size={25} /> to add favorites</Text>
           <Overlay height={450} width={'95%'} isVisible={this.state.isVisible}
-                   onBackdropPress={() => this.setState({ isVisible: false })}>
+            onBackdropPress={() => this.setState({ isVisible: false })}>
 
             <Text h2 h2Style={{
               color: colors.bloodOrange,
               textAlign: 'center',
-              fontWeight: '700',
+              fontWeight: '700'
             }}>Global Stats</Text>
             <View style={{
               flexDirection: 'column',
               justifyContent: 'space-around',
               flex: 1,
-              backgroundColor: colors.transparent,
+              backgroundColor: colors.transparent
             }}>
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 padding: 10,
-                backgroundColor: colors.transparent,
+                backgroundColor: colors.transparent
               }}>
                 <Text style={{
                   fontSize: 18,
                   color: colors.bloodOrange,
                   fontWeight: 'bold',
-                  flex: 0.5,
+                  flex: 0.5
                 }}>Totol Coins</Text>
                 <Text style={{
                   fontSize: 18,
@@ -286,20 +295,20 @@ class FavoritesScreen extends Component {
                   fontWeight: 'bold',
                   textAlign: 'right',
                   right: 0,
-                  flex: 0.5,
+                  flex: 0.5
                 }}>{stats.payload.data.totalCoins}</Text>
               </View>
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 padding: 10,
-                backgroundColor: colors.transparent,
+                backgroundColor: colors.transparent
               }}>
                 <Text style={{
                   fontSize: 18,
                   color: colors.bloodOrange,
                   fontWeight: 'bold',
-                  flex: 0.5,
+                  flex: 0.5
                 }}>Totol Markets</Text>
                 <Text style={{
                   fontSize: 18,
@@ -307,20 +316,20 @@ class FavoritesScreen extends Component {
                   fontWeight: 'bold',
                   textAlign: 'right',
                   right: 0,
-                  flex: 0.5,
+                  flex: 0.5
                 }}>{stats.payload.data.totalMarkets}</Text>
               </View>
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 backgroundColor: colors.transparent,
-                padding: 10,
+                padding: 10
               }}>
                 <Text style={{
                   fontSize: 18,
                   color: colors.bloodOrange,
                   fontWeight: 'bold',
-                  flex: 0.5,
+                  flex: 0.5
                 }}>Totol Exchanges</Text>
                 <Text style={{
                   fontSize: 18,
@@ -328,20 +337,20 @@ class FavoritesScreen extends Component {
                   fontWeight: 'bold',
                   textAlign: 'right',
                   right: 0,
-                  flex: 0.5,
+                  flex: 0.5
                 }}>{_.ceil(stats.payload.data.totalExchanges, 2)}</Text>
               </View>
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 backgroundColor: colors.transparent,
-                padding: 10,
+                padding: 10
               }}>
                 <Text style={{
                   fontSize: 18,
                   color: colors.bloodOrange,
                   fontWeight: 'bold',
-                  flex: 0.5,
+                  flex: 0.5
                 }}>Totol Market Cap</Text>
                 <Text style={{
                   fontSize: 18,
@@ -349,20 +358,20 @@ class FavoritesScreen extends Component {
                   fontWeight: 'bold',
                   textAlign: 'right',
                   right: 0,
-                  flex: 0.5,
+                  flex: 0.5
                 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.totalMarketCap, 2)}</Text>
               </View>
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around',
                 backgroundColor: colors.transparent,
-                padding: 10,
+                padding: 10
               }}>
                 <Text style={{
                   fontSize: 18,
                   color: colors.bloodOrange,
                   fontWeight: 'bold',
-                  flex: 0.5,
+                  flex: 0.5
                 }}>Totol 24h Volume</Text>
                 <Text style={{
                   fontSize: 18,
@@ -370,7 +379,7 @@ class FavoritesScreen extends Component {
                   fontWeight: 'bold',
                   textAlign: 'right',
                   right: 0,
-                  flex: 0.5,
+                  flex: 0.5
                 }}>{coins.payload.data.base.sign} {_.ceil(stats.payload.data.total24hVolume, 2)}</Text>
               </View>
             </View>
@@ -392,7 +401,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    favoritesCoinsRequest: (ids) => dispatch(FavoritesCoinsActions.favoritesCoinsRequest(ids))
+    favoritesCoinsRequest: (ids) => dispatch(FavoritesCoinsActions.favoritesCoinsRequest(ids)),
+    addFavorite: (id) => dispatch(FavoritesActions.addFavorite(id)),
+    removeFavorite: (id) => dispatch(FavoritesActions.removeFavorite(id))
   }
 }
 
