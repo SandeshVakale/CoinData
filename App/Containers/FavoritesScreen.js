@@ -262,7 +262,17 @@ class FavoritesScreen extends Component {
       const { stats, coins } = this.props
       return (
         <View>
-          <Text style={{ textAlign: 'center' }}>Click on <Icon name={'star-outline'} color={colors.bloodOrange} size={25} /> to add favorites</Text>
+          <Header containerStyle={{ backgroundColor: colors.bloodOrange }}
+                  rightComponent={<DateAndTime />} centerComponent={{
+            text: 'Favorites',
+            style: { color: colors.silver, fontWeight: '900', fontSize: 28 }
+          }} leftComponent={<Icon
+            // raised
+            name='earth'
+            size={34}
+            color={colors.silver}
+            onPress={() => this.setState({ isVisible: true })} />} />
+          <Text style={{ textAlign: 'center' }}>Click on coins<Icon name={'star-outline'} color={colors.bloodOrange} size={25} /> to add favorites</Text>
           <Overlay height={450} width={'95%'} isVisible={this.state.isVisible}
             onBackdropPress={() => this.setState({ isVisible: false })}>
 
