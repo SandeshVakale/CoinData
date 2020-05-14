@@ -23,11 +23,11 @@ import { Colors } from '../Themes'
 // import SvgUri from 'react-native-svg-uri'
 
 const timePeriods = [
-  '24h', '7d', '30d', '1y', '5y',
+  '24h', '7d', '30d', '1y', '5y'
 ]
 
 const bases = [
-  'USD', 'EUR', 'JPY', 'INR', 'GBP', 'CAD',
+  'USD', 'EUR', 'JPY', 'INR', 'GBP', 'CAD'
 ]
 
 class DetailScreen extends Component {
@@ -66,7 +66,6 @@ class DetailScreen extends Component {
     }
   }
 
-
   componentDidMount () {
     const { coinRequest, coinHistoryRequest, marketsRequest, exchangesRequest, favorites } = this.props
     const { base, timePeriod, id } = this.state
@@ -99,7 +98,7 @@ class DetailScreen extends Component {
     const { timePeriod, refresh, id } = this.state
     const { coinRequest, coinHistoryRequest } = this.props
     this.setState({ base: item.item, refresh: !refresh })
-    //console.log('item', item)
+    // console.log('item', item)
     coinRequest(id, item.item, timePeriod)
     coinHistoryRequest(id, timePeriod, item.item)
   }
@@ -110,87 +109,88 @@ class DetailScreen extends Component {
     // console.log('exchanges', exchanges)
     if (coin.fetching === false && markets.fetching === false && exchanges.fetching === false && exchanges.payload && exchanges.payload.data && markets.payload && markets.payload.data && coin.payload && coin.payload.data && coinHistory.fetching === false) {
       let data = coin.payload.data.coin
-      let history = coinHistory && coinHistory.payload && coinHistory.payload.data && !coinHistory.payload.data.history.includes(null) ? [...coinHistory.payload.data.history].map((i) => { return i.price}) : []
-      let labels = coinHistory && coinHistory.payload && coinHistory.payload.data && !coinHistory.payload.data.history.includes(null) ? [...coinHistory.payload.data.history].map((i) => { return i.timestamp}) : []
+      let history = coinHistory && coinHistory.payload && coinHistory.payload.data && !coinHistory.payload.data.history.includes(null) ? [...coinHistory.payload.data.history].map((i) => { return i.price }) : []
+      let labels = coinHistory && coinHistory.payload && coinHistory.payload.data && !coinHistory.payload.data.history.includes(null) ? [...coinHistory.payload.data.history].map((i) => { return i.timestamp }) : []
       // console.log('labels', labels)
       let AllTimeHigh = new Date(data.allTimeHigh.timestamp)
       let FirstSeen = new Date(data.firstSeen)
       return (
-        <View style={{ flex: 1, backgroundColor: color ? color : colors.bloodOrange }}>
-          <Header containerStyle={{ backgroundColor: color ? color : colors.bloodOrange }}
-                  rightComponent={<DateAndTime/>} leftComponent={<Icon
+        <View style={{ flex: 1, backgroundColor: color || colors.bloodOrange }}>
+          <Header containerStyle={{ backgroundColor: color || colors.bloodOrange }}
+            rightComponent={<DateAndTime />} leftComponent={<Icon
             // raised
-            name='arrow-left'
-            size={34}
-            color={colors.silver}
-            onPress={() => this.props.navigation.goBack()}/>}
-                  centerComponent={{
-                    text: data.name,
-                    style: { color: colors.silver, fontWeight: '900', fontSize: 28 },
-                  }}/>
+              name='arrow-left'
+              size={34}
+              color={colors.silver}
+              onPress={() => this.props.navigation.goBack()} />}
+            centerComponent={{
+              text: data.name,
+              style: { color: colors.silver, fontWeight: '900', fontSize: 28 }
+            }} />
           <ScrollView showsVerticalScrollIndicator={false}
-                      style={{ backgroundColor: color ? color : colors.bloodOrange }}>
+            style={{ backgroundColor: color || colors.bloodOrange }}>
             <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
               <View style={{ flexDirection: 'column' }}>
-              <Text
-                style={{ fontSize: 18, backgroundColor: color, fontWeight: 'bold', color: colors.silver }}>Price</Text>
-              <View style={{ backgroundColor: color, flexDirection: 'row', alignItems: 'center' }}>
-                <Text h4 h4Style={{
-                  backgroundColor: color,
-                  color: colors.silver,
-                  fontWeight: 'bold',
-                }}>{coin.payload.data.base.sign} {_.ceil(data.price, 2)}</Text>
-                <Text style={{
-                  fontSize: 18,
-                  fontWeight: 'bold',
-                  color: Math.sign(data.change) === -1 ? colors.error : colors.lightgreen,
-                  paddingLeft: 15,
-                }}>{data.change}%</Text>
+                <Text
+                  style={{ fontSize: 18, backgroundColor: color, fontWeight: 'bold', color: colors.silver }}>Price</Text>
+                <View style={{ backgroundColor: color, flexDirection: 'row', alignItems: 'center' }}>
+                  <Text h4 h4Style={{
+                    backgroundColor: color,
+                    color: colors.silver,
+                    fontWeight: 'bold'
+                  }}>{coin.payload.data.base.sign} {_.ceil(data.price, 2)}</Text>
+                  <Text style={{
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    color: Math.sign(data.change) === -1 ? colors.error : colors.lightgreen,
+                    paddingLeft: 15
+                  }}>{data.change}%</Text>
+                </View>
               </View>
-              </View>
-                <TouchableOpacity
-                  style={{ backgroundColor: colors.transparent, padding: 2 }}
-                  onPress={() => this._changeState()} >
-                  <Icon
-                    color={colors.silver}
-                    size={35}
-                    name={iconFavorites}
+              <TouchableOpacity
+                style={{ backgroundColor: colors.transparent, padding: 2 }}
+                onPress={() => this._changeState()} >
+                <Icon
+                  color={colors.silver}
+                  size={35}
+                  name={iconFavorites}
                   />
-                </TouchableOpacity>
+              </TouchableOpacity>
             </View>
             <View style={{ alignItems: 'center' }}>
               {data && history.length > 0 && <LineChart
                 data={{
                   datasets: [
                     {
-                      data: history,
-                    },
-                  ],
+                      data: history
+                    }
+                  ]
                 }}
-                withDots={true}
+                withDots
                 width={Dimensions.get('window').width} // from react-native
                 height={280}
                 withInnerLines={false}
                 withVerticalLabels={false}
                 yAxisLabel={coin.payload.data.base.sign}
                 yAxisInterval={1} // optional, defaults to 1
-                onDataPointClick={({ value, index }) =>{
+                onDataPointClick={({ value, index }) => {
                   let currentDate = new Date(labels[index])
-                  let date = currentDate.getDate();
-                  let month = currentDate.getMonth();
-                  let year = currentDate.getFullYear();
+                  let date = currentDate.getDate()
+                  let month = currentDate.getMonth()
+                  let year = currentDate.getFullYear()
                   showMessage({
                     message: `Price of ${data.name} on ${date}/${month + 1}/${year}`,
                     description: coin.payload.data.base.sign + value,
-                    type: "default",
-                    backgroundColor: color ? color : colors.bloodOrange, // background color
-                    color: colors.silver, // text color
-                  })}
+                    type: 'default',
+                    backgroundColor: color || colors.bloodOrange, // background color
+                    color: colors.silver // text color
+                  })
+                }
                 }
                 chartConfig={{
-                  backgroundColor: color ? color : colors.bloodOrange,
-                  backgroundGradientFrom: color ? color : colors.bloodOrange,
-                  backgroundGradientTo: color ? color : colors.bloodOrange,
+                  backgroundColor: color || colors.bloodOrange,
+                  backgroundGradientFrom: color || colors.bloodOrange,
+                  backgroundGradientTo: color || colors.bloodOrange,
                   decimalPlaces: 2, // optional, defaults to 2dp
                   color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                   labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -200,47 +200,47 @@ class DetailScreen extends Component {
                   propsForDots: {
                     r: '0',
                     strokeWidth: '2',
-                    stroke: color ? color : colors.bloodOrange,
-                  },
+                    stroke: color || colors.bloodOrange
+                  }
                 }}
                 bezier
               />}
             </View>
             <FlashMessage
-              position="top"
+              position='top'
               // floating
               // style={{ height: 50, }}
-              hideStatusBar={true}
+              hideStatusBar
               titleStyle={{ fontWeight: 'bold' }}
             />
             {history.length > 0 && <View style={{ height: 100, alignItems: 'center', marginTop: -100 }}>
               <FlatList data={timePeriods} horizontal extraData={refresh}
-                        style={{ height: 50 }}
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{ height: 50, borderColor: Colors.coal, marginTop: 50 }}
-                        renderItem={(item) => <Button
-                          key={item.item.id}
-                          titleStyle={{
-                            color: colors.silver,
-                            fontWeight: timePeriod === item.item ? 'bold' : 'normal',
-                          }}
-                          onPress={() => this.reload(item)}
-                          buttonStyle={timePeriod === item.item ? styles.active : styles.deactive}
-                          title={(item.item).toUpperCase()}/>
-                        }/>
+                style={{ height: 50 }}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ height: 50, borderColor: Colors.coal, marginTop: 50 }}
+                renderItem={(item) => <Button
+                  key={item.item.id}
+                  titleStyle={{
+                    color: colors.silver,
+                    fontWeight: timePeriod === item.item ? 'bold' : 'normal'
+                  }}
+                  onPress={() => this.reload(item)}
+                  buttonStyle={timePeriod === item.item ? styles.active : styles.deactive}
+                  title={(item.item).toUpperCase()} />
+                        } />
             </View>}
 
             <View style={{ height: 100, alignItems: 'center', marginTop: -10 }}>
               <FlatList data={bases} horizontal extraData={refresh}
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{ height: 50, borderColor: Colors.coal, marginTop: 50 }}
-                        renderItem={(item) => <Button
-                          key={item.item.id}
-                          titleStyle={{ color: colors.silver, fontWeight: base === item.item ? 'bold' : 'normal' }}
-                          onPress={() => this.hotReload(item)}
-                          buttonStyle={base === item.item ? styles.active : styles.deactive}
-                          title={item.item}/>
-                        }/>
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ height: 50, borderColor: Colors.coal, marginTop: 50 }}
+                renderItem={(item) => <Button
+                  key={item.item.id}
+                  titleStyle={{ color: colors.silver, fontWeight: base === item.item ? 'bold' : 'normal' }}
+                  onPress={() => this.hotReload(item)}
+                  buttonStyle={base === item.item ? styles.active : styles.deactive}
+                  title={item.item} />
+                        } />
             </View>
 
             <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -249,19 +249,19 @@ class DetailScreen extends Component {
                   fontSize: 18,
                   backgroundColor: color,
                   fontWeight: 'bold',
-                  color: colors.silver,
+                  color: colors.silver
                 }}>{'All time high'}</Text>
                 <View style={{ backgroundColor: color, flexDirection: 'row', alignItems: 'center' }}>
                   <Text h4 h4Style={{
                     backgroundColor: color,
                     color: colors.silver,
-                    fontWeight: 'bold',
+                    fontWeight: 'bold'
                   }}>{coin.payload.data.base.sign} {_.ceil(data.allTimeHigh.price, 2)}</Text>
                   <Text style={{
                     fontSize: 18,
                     fontWeight: 'bold',
                     color: colors.silver,
-                    paddingLeft: 15,
+                    paddingLeft: 15
                   }}>{AllTimeHigh.getDate() + '/' + (AllTimeHigh.getMonth() + 1) + '/' + AllTimeHigh.getFullYear()}</Text>
                 </View>
               </View>
@@ -269,7 +269,7 @@ class DetailScreen extends Component {
                 {data.iconUrl !== null && <Image
                   source={{ uri: data.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
                   style={{ width: 90, height: 90, resizeMode: 'contain' }}
-                  PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                  PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }} />}
                 />}
               </View>
             </View>
@@ -278,19 +278,19 @@ class DetailScreen extends Component {
               color: colors.silver,
               fontSize: 18,
               paddingHorizontal: 10,
-              paddingBottom: 10,
+              paddingBottom: 10
             }}>{data.description}</Text>
-            <Divider style={{ backgroundColor: colors.silver }}/>
+            <Divider style={{ backgroundColor: colors.silver }} />
             <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Market Stats</Text>
             <View style={{
               flexDirection: 'row',
               justifyContent: 'space-around',
               alignItems: 'center',
               padding: 10,
-              backgroundColor: colors.transparent,
+              backgroundColor: colors.transparent
             }}>
               <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
-                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-bar'} color={colors.silver}/>
+                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-bar'} color={colors.silver} />
                 <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold' }}>Market Capital</Text>
               </View>
               <Text style={{
@@ -299,7 +299,7 @@ class DetailScreen extends Component {
                 fontWeight: 'bold',
                 textAlign: 'right',
                 right: 0,
-                flex: 0.5,
+                flex: 0.5
               }}>{coin.payload.data.base.sign} {data.marketCap}</Text>
             </View>
             <View style={{
@@ -307,10 +307,10 @@ class DetailScreen extends Component {
               justifyContent: 'space-around',
               alignItems: 'center',
               padding: 10,
-              backgroundColor: colors.transparent,
+              backgroundColor: colors.transparent
             }}>
               <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
-                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-bar-stacked'} color={colors.silver}/>
+                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-bar-stacked'} color={colors.silver} />
                 <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold' }}>Volume</Text>
               </View>
               <Text style={{
@@ -319,7 +319,7 @@ class DetailScreen extends Component {
                 fontWeight: 'bold',
                 textAlign: 'right',
                 right: 0,
-                flex: 0.5,
+                flex: 0.5
               }}>{coin.payload.data.base.sign} {data.volume}</Text>
             </View>
             <View style={{
@@ -327,10 +327,10 @@ class DetailScreen extends Component {
               justifyContent: 'space-around',
               alignItems: 'center',
               padding: 10,
-              backgroundColor: colors.transparent,
+              backgroundColor: colors.transparent
             }}>
               <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
-                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-donut'} color={colors.silver}/>
+                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-donut'} color={colors.silver} />
                 <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold' }}>Circulating Supply</Text>
               </View>
               <Text style={{
@@ -339,7 +339,7 @@ class DetailScreen extends Component {
                 fontWeight: 'bold',
                 textAlign: 'right',
                 right: 0,
-                flex: 0.5,
+                flex: 0.5
               }}>{_.ceil(data.circulatingSupply, 2)}</Text>
             </View>
             <View style={{
@@ -347,10 +347,10 @@ class DetailScreen extends Component {
               justifyContent: 'space-around',
               alignItems: 'center',
               padding: 10,
-              backgroundColor: colors.transparent,
+              backgroundColor: colors.transparent
             }}>
               <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
-                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-pie'} color={colors.silver}/>
+                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-pie'} color={colors.silver} />
                 <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold' }}>Total Supply</Text>
               </View>
               <Text style={{
@@ -359,7 +359,7 @@ class DetailScreen extends Component {
                 fontWeight: 'bold',
                 textAlign: 'right',
                 right: 0,
-                flex: 0.5,
+                flex: 0.5
               }}>{_.ceil(data.totalSupply, 2)}</Text>
             </View>
             <View style={{
@@ -367,10 +367,10 @@ class DetailScreen extends Component {
               justifyContent: 'space-around',
               alignItems: 'center',
               padding: 10,
-              backgroundColor: colors.transparent,
+              backgroundColor: colors.transparent
             }}>
               <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
-                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-bubble'} color={colors.silver}/>
+                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-bubble'} color={colors.silver} />
                 <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold' }}>Number Of Markets</Text>
               </View>
               <Text style={{
@@ -379,7 +379,7 @@ class DetailScreen extends Component {
                 fontWeight: 'bold',
                 textAlign: 'right',
                 right: 0,
-                flex: 0.5,
+                flex: 0.5
               }}>{_.ceil(data.numberOfMarkets, 2)}</Text>
             </View>
             <View style={{
@@ -387,11 +387,11 @@ class DetailScreen extends Component {
               justifyContent: 'space-around',
               alignItems: 'center',
               padding: 10,
-              backgroundColor: colors.transparent,
+              backgroundColor: colors.transparent
             }}>
               <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
                 <Icon size={24} style={{ paddingHorizontal: 5 }} name={'chart-scatterplot-hexbin'}
-                      color={colors.silver}/>
+                  color={colors.silver} />
                 <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold' }}>Number Of Exchanges</Text>
               </View>
               <Text style={{
@@ -400,7 +400,7 @@ class DetailScreen extends Component {
                 fontWeight: 'bold',
                 textAlign: 'right',
                 right: 0,
-                flex: 0.5,
+                flex: 0.5
               }}>{_.ceil(data.numberOfExchanges, 2)}</Text>
             </View>
             <View style={{
@@ -408,10 +408,10 @@ class DetailScreen extends Component {
               justifyContent: 'space-around',
               alignItems: 'center',
               padding: 10,
-              backgroundColor: colors.transparent,
+              backgroundColor: colors.transparent
             }}>
               <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
-                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'calendar-clock'} color={colors.silver}/>
+                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'calendar-clock'} color={colors.silver} />
                 <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold' }}>First Seen</Text>
               </View>
               <Text style={{
@@ -420,7 +420,7 @@ class DetailScreen extends Component {
                 fontWeight: 'bold',
                 textAlign: 'right',
                 right: 0,
-                flex: 0.5,
+                flex: 0.5
               }}>{FirstSeen.getDate() + '/' + (FirstSeen.getMonth() + 1) + '/' + FirstSeen.getFullYear()}</Text>
             </View>
             <View style={{
@@ -428,10 +428,10 @@ class DetailScreen extends Component {
               justifyContent: 'space-around',
               alignItems: 'center',
               padding: 10,
-              backgroundColor: colors.transparent,
+              backgroundColor: colors.transparent
             }}>
               <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'center' }}>
-                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'gesture-swipe-up'} color={colors.silver}/>
+                <Icon size={24} style={{ paddingHorizontal: 5 }} name={'gesture-swipe-up'} color={colors.silver} />
                 <Text style={{ fontSize: 18, color: colors.silver, fontWeight: 'bold' }}>Popularity</Text>
               </View>
               <Text style={{
@@ -440,55 +440,55 @@ class DetailScreen extends Component {
                 fontWeight: 'bold',
                 textAlign: 'right',
                 right: 0,
-                flex: 0.5,
+                flex: 0.5
               }}>{data.rank}</Text>
             </View>
-            <Divider style={{ backgroundColor: colors.silver }}/>
+            <Divider style={{ backgroundColor: colors.silver }} />
             {data.links.length > 0 && <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Links</Text>}
             <FlatList data={data.links}
-                      showsHorizontalScrollIndicator={false} style={{ paddingBottom: 15 }} horizontal
-                      renderItem={(item) => <Button
-                        key={item.item.id}
-                        onPress={() => Linking.openURL(item.item.url)}
-                        buttonStyle={{
-                          backgroundColor: colors.silver,
-                          marginHorizontal: 10,
-                          borderRadius: 20,
-                          paddingHorizontal: 15,
-                          alignSelf: 'center',
-                        }}
-                        title={'#' + item.item.name}
-                        titleStyle={{ color: color }}/>
-                      }/>
-            <Divider style={{ backgroundColor: colors.silver }}/>
+              showsHorizontalScrollIndicator={false} style={{ paddingBottom: 15 }} horizontal
+              renderItem={(item) => <Button
+                key={item.item.id}
+                onPress={() => Linking.openURL(item.item.url)}
+                buttonStyle={{
+                  backgroundColor: colors.silver,
+                  marginHorizontal: 10,
+                  borderRadius: 20,
+                  paddingHorizontal: 15,
+                  alignSelf: 'center'
+                }}
+                title={'#' + item.item.name}
+                titleStyle={{ color: color }} />
+                      } />
+            <Divider style={{ backgroundColor: colors.silver }} />
             {data.socials.length > 0 && <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Socials</Text>}
             <FlatList data={data.socials}
-                      showsHorizontalScrollIndicator={false} style={{ paddingBottom: 15 }} horizontal
-                      renderItem={(item) => <Button
-                        key={item.item.id}
-                        onPress={() => Linking.openURL(item.item.url)}
-                        buttonStyle={{
-                          backgroundColor: colors.silver,
-                          marginHorizontal: 10,
-                          borderRadius: 20,
-                          paddingHorizontal: 15,
-                          alignSelf: 'center',
-                        }}
-                        title={'#' + item.item.name}
-                        titleStyle={{ color: color }}/>
-                      }/>
-            <Divider style={{ backgroundColor: colors.silver }}/>
+              showsHorizontalScrollIndicator={false} style={{ paddingBottom: 15 }} horizontal
+              renderItem={(item) => <Button
+                key={item.item.id}
+                onPress={() => Linking.openURL(item.item.url)}
+                buttonStyle={{
+                  backgroundColor: colors.silver,
+                  marginHorizontal: 10,
+                  borderRadius: 20,
+                  paddingHorizontal: 15,
+                  alignSelf: 'center'
+                }}
+                title={'#' + item.item.name}
+                titleStyle={{ color: color }} />
+                      } />
+            <Divider style={{ backgroundColor: colors.silver }} />
 
             <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Markets Containing {data.name}</Text>
             <FlatList data={markets.payload.data.markets}
-                      contentContainerStyle={{ paddingBottom: 15 }}
-                      renderItem={
+              contentContainerStyle={{ paddingBottom: 15 }}
+              renderItem={
               (item) => <View style={{ flexDirection: 'row', padding: 5, borderWidth: 1, margin: 5, borderColor: colors.silver, borderRadius: 12}} >
                 <View style={{flex: 0.2, alignItems: 'center'}}>
                   {item.item.sourceIconUrl !== null && <Image
                     source={{ uri: item.item.sourceIconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
                     style={{ width: 50, height: 50, resizeMode: 'contain' }}
-                    PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                    PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }} />}
                   />}
                 </View>
                 <View style={{ flex: 0.5, flexDirection: 'column' }}>
@@ -501,18 +501,18 @@ class DetailScreen extends Component {
                 </View>
               </View>
             } />
-            <Divider style={{ backgroundColor: colors.silver }}/>
+            <Divider style={{ backgroundColor: colors.silver }} />
 
             <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', padding: 10 }}>Exchanges trading {data.name}</Text>
             <FlatList data={exchanges.payload.data.exchanges}
-                      contentContainerStyle={{ paddingBottom: 15 }}
-                      renderItem={
+              contentContainerStyle={{ paddingBottom: 15 }}
+              renderItem={
                         (item) => <View style={{ flexDirection: 'row', padding: 5, borderWidth: 1, margin: 5, borderColor: colors.silver, borderRadius: 12}} >
                           <View style={{flex: 0.2, alignItems: 'center'}}>
                             {item.item.iconUrl !== null && <Image
                               source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
                               style={{ width: 50, height: 50, resizeMode: 'contain' }}
-                              PlaceholderContent={<ActivityIndicator style={{backgroundColor: colors.transparent}}/>}
+                              PlaceholderContent={<ActivityIndicator style={{backgroundColor: colors.transparent}} />}
                             />}
                           </View>
                           <View style={{ flex: 0.5, flexDirection: 'column' }}>
@@ -525,7 +525,7 @@ class DetailScreen extends Component {
                           </View>
                         </View>
                       } />
-            <Divider style={{ backgroundColor: colors.silver }}/>
+            <Divider style={{ backgroundColor: colors.silver }} />
           </ScrollView>
         </View>
       )
@@ -536,9 +536,9 @@ class DetailScreen extends Component {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: color ? color : colors.bloodOrange,
+          backgroundColor: color || colors.bloodOrange
         }}>
-          <ActivityIndicator color={colors.silver}/>
+          <ActivityIndicator color={colors.silver} />
         </View>
       )
     }

@@ -19,7 +19,8 @@ export const reducers = combineReducers({
   exchanges: require('./ExchangesRedux').reducer,
   exchange: require('./ExchangeRedux').reducer,
   market: require('./MarketRedux').reducer,
-  favorites: require('./FavoritesRedux').reducer
+  favorites: require('./FavoritesRedux').reducer,
+  favoritesCoins: require('./FavoritesCoinsRedux').reducer
 })
 
 export default () => {
