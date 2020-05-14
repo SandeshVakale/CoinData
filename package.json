@@ -80,6 +80,7 @@
     "@storybook/react-native": "^4.1.11",
     "babel-eslint": "7.1.1",
     "babel-jest": "^24.9.0",
+    "babel-plugin-ignite-ignore-reactotron": "^0.3.0",
     "eslint": "^6.6.0",
     "ignite-andross": "^4.2.0",
     "ignite-redux-persist": "1.1.2",
