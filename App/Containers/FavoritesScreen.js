@@ -54,9 +54,9 @@ class FavoritesScreen extends Component {
 
   render () {
     const { stats, coins, favoritesCoins, favorites, removeFavorite, addFavorite } = this.props
-    // console.log('favoritesCoins', favoritesCoins)
+    console.log('favoritesCoins, favorites', favoritesCoins, favorites)
     const { base, timePeriod } = this.state
-    if (favorites && favorites.favorites && favorites.favorites.length > 0 && favoritesCoins && favoritesCoins.fetching === false && favoritesCoins.payload !== null && favoritesCoins.payload.data && favoritesCoins.payload.data.coins.length > 0) {
+    if (favoritesCoins.payload !== null && favoritesCoins.payload.data && favoritesCoins.payload.data.coins.length > 0 && favoritesCoins.payload.data.coins[0] !== null && favorites && favorites.favorites && favorites.favorites.length > 0 && favoritesCoins && favoritesCoins.fetching === false) {
       return (
         <View style={{ flex: 1 }}>
           <Header containerStyle={{ backgroundColor: colors.bloodOrange }}
@@ -73,7 +73,7 @@ class FavoritesScreen extends Component {
                     // initialNumToRender={20}
             keyExtractor={(item, index) => index}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{borderColor: Colors.coal, backgroundColor: colors.silver }}
+            contentContainerStyle={{ borderColor: Colors.coal, backgroundColor: colors.silver }}
             renderItem={
                       (item) => <TouchableHighlight onPress={() => this.props.navigation.navigate(
                         'DetailScreen',
