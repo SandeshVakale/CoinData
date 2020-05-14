@@ -1,7 +1,6 @@
 // a library to wrap and simplify api calls
 import apisauce from 'apisauce'
 import Config from '../Config/AppConfig'
-import { ap } from 'ramda'
 
 // our "constructor"
 const create = (baseURL = Config.BASE_URL) => {
@@ -46,6 +45,10 @@ const create = (baseURL = Config.BASE_URL) => {
   const getWinners = ({ base, timePeriod, sort, limit, order }) => api.get('/coins', {base, timePeriod, sort, limit, order})
   const getLosers = ({ base, timePeriod, sort, limit, order }) => api.get('/coins', {base, timePeriod, sort, limit, order})
   const getMarkets = ({ refCurrencyId, baseCurrencyId, limit }) => api.get('/markets', {refCurrencyId, baseCurrencyId, limit})
+  const getExchanges = ({ refCurrencyId, limit }) => api.get('/exchanges', { refCurrencyId, limit })
+  const getExchange = ({ limit }) => api.get('./exchanges', { limit })
+  const getMarket = ({ limit }) => api.get('./markets', { limit })
+  const getFavoritesCoins = ({ ids }) => api.get('./coins', {ids})
 
   // ------
   // STEP 3
@@ -70,7 +73,11 @@ const create = (baseURL = Config.BASE_URL) => {
     getCoinHistory,
     getWinners,
     getLosers,
-    getMarkets
+    getMarkets,
+    getExchanges,
+    getExchange,
+    getMarket,
+    getFavoritesCoins
   }
 }
 

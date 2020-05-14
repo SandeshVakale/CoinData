@@ -69,3 +69,7 @@ The `.env` file is ignored by git keeping those secrets out of your repo.
 ### Project Images
 [![js-standard-style](./App/Images/Image1.png)] [![js-standard-style](./App/Images/Image2.png)]
 [![js-standard-style](./App/Images/Image.png)] [![js-standard-style](./App/Images/Image3.png)]
+[![js-standard-style](./App/Images/Image5.png)] [![js-standard-style](./App/Images/Image6.png)]
+[![js-standard-style](./App/Images/Image7.png)] [![js-standard-style](./App/Images/Image8.png)]
+[![js-standard-style](./App/Images/Image9.png)] [![js-standard-style](./App/Images/Image10.png)]
+[![js-standard-style](./App/Images/Image11.png)] [![js-standard-style](./App/Images/Image12.png)]

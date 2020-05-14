@@ -15,7 +15,12 @@ export const reducers = combineReducers({
   coinHistory: require('./CoinHistoryRedux').reducer,
   winners: require('./WinnersRedux').reducer,
   losers: require('./LosersRedux').reducer,
-  markets: require('./MarketsRedux').reducer
+  markets: require('./MarketsRedux').reducer,
+  exchanges: require('./ExchangesRedux').reducer,
+  exchange: require('./ExchangeRedux').reducer,
+  market: require('./MarketRedux').reducer,
+  favorites: require('./FavoritesRedux').reducer,
+  favoritesCoins: require('./FavoritesCoinsRedux').reducer
 })
 
 export default () => {

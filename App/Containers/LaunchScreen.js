@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { FlatList, View, Dimensions, ActivityIndicator, ScrollView, Linking, TouchableHighlight } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { Colors } from '../Themes'
-import { Button, Text, Header, Overlay, Divider } from 'react-native-elements'
+import { Button, Text, Header, Overlay, Divider, Image } from 'react-native-elements'
 import { connect } from 'react-redux'
 import CoinsActions from '../Redux/CoinsRedux'
 import GlobalStatsActions from '../Redux/GlobalStatsRedux'
@@ -47,7 +47,7 @@ class LaunchScreen extends Component {
   componentDidMount () {
     const { base, timePeriod } = this.state
     const { coinsRequest, globalStatsRequest, winnersRequest, losersRequest } = this.props
-    coinsRequest(base, timePeriod, null, null, 50, null)
+    coinsRequest(base, timePeriod, null, null, 100, null)
     winnersRequest(base, timePeriod, 'change', 10, 'desc')
     losersRequest(base, timePeriod, 'change', 10, 'asc')
     globalStatsRequest(base)
@@ -57,7 +57,7 @@ class LaunchScreen extends Component {
     const { base, refresh } = this.state
     const { coinsRequest, winnersRequest, losersRequest } = this.props
     this.setState({ timePeriod: item.item, refresh: !refresh })
-    coinsRequest(base, item.item, null, null, 50, null)
+    coinsRequest(base, item.item, null, null, 100, null)
     winnersRequest(base, item.item, 'change', 10, 'desc')
     losersRequest(base, item.item, 'change', 10, 'asc')
   }
@@ -67,7 +67,7 @@ class LaunchScreen extends Component {
     const { coinsRequest, globalStatsRequest, winnersRequest, losersRequest } = this.props
     this.setState({ base: item.item, refresh: !refresh })
     //console.log('item', item)
-    coinsRequest(item.item, timePeriod, null, null, 50, null)
+    coinsRequest(item.item, timePeriod, null, null, 100, null)
     globalStatsRequest(item.item)
     winnersRequest(item.item, timePeriod, 'change', 10, 'desc')
     losersRequest(item.item, timePeriod, 'change', 10, 'asc')
@@ -76,7 +76,7 @@ class LaunchScreen extends Component {
   componentDidUpdate (prevProps) {
     const { coins } = this.props
     const { active } = this.state
-    if (!_.isEqual(coins, prevProps.coins) && coins.fetching === false) {
+    if (!_.isEqual(coins, prevProps.coins) && coins.fetching === false && coins.payload !== null) {
       this.setState({ graphData: coins.payload.data.coins[active] })
     }
   }
@@ -88,7 +88,7 @@ class LaunchScreen extends Component {
     if (graphData === null && coins.fetching === false && coins.payload !== null) {
       this.setState({ graphData: coins.payload.data.coins[0] })
     }
-    if (coins.fetching === false && winners.fetching === false && losers.fetching === false) {
+    if (coins.fetching === false && coins.payload !== null && winners.fetching === false && winners.payload !== null && losers.fetching === false && losers.payload !== null) {
       return (
         <View style={{ flex: 1, backgroundColor: graphData && graphData.color ? graphData.color : colors.bloodOrange }}>
           {graphData &&
@@ -236,6 +236,23 @@ class LaunchScreen extends Component {
               width: '80%',
               alignSelf: 'center',
             }} title={'Know More about ' + graphData.name} titleStyle={{ color: colors.silver, fontWeight: 'bold' }}/>}
+
+            <Button icon={<Icon
+              style={{ paddingRight: 10 }}
+              name="home"
+              size={22}
+              color={colors.silver}
+            />}
+              onPress={() => this.props.navigation.navigate('postStack')} buttonStyle={{
+              backgroundColor: colors.transparent,
+              borderColor: colors.transparent,
+              borderWidth: 2,
+              marginVertical: 10,
+              paddingHorizontal: 30,
+              width: '80%',
+              alignSelf: 'center',
+            }} title={'Get Started'} titleStyle={{ color: colors.silver, fontWeight: 'bold' }}/>
+
             {graphData && stats.fetching === false &&
             <Overlay height={450} width={'95%'} isVisible={this.state.isVisible}
                      onBackdropPress={() => this.setState({ isVisible: false })}>
@@ -381,8 +398,8 @@ class LaunchScreen extends Component {
                             alignItems: 'center',
                             alignContent: 'center',
                             height: 100,
-                            width: 200,
-                            marginHorizontal: 10,
+                            width: 250,
+                            marginHorizontal: 2,
                             borderRadius: 12,
                             borderWidth: 2,
                             borderColor: colors.silver,
@@ -398,12 +415,13 @@ class LaunchScreen extends Component {
                               alignItems: 'center',
                               alignContent: 'center',
                             }}>
-                              <SvgUri
-                                style={{ paddingRight: 5, flex: 0.5, alignItems: 'center'}}
-                                width={40}
-                                height={40}
-                                source={{ uri: item.item.iconUrl }}
-                              />
+                              <View style={{flex: 0.2, alignItems: 'center'}}>
+                                {item.item.iconUrl !== null && <Image
+                                  source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                                  style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                                  PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                                />}
+                              </View>
                               <View style={{
                                 flexDirection: 'column',
                                 justifyContent: 'space-around',
@@ -411,7 +429,7 @@ class LaunchScreen extends Component {
                                 alignContent: 'center',
                                 flex: 0.5
                               }}>
-                                <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
+                                <Text numberOfLines={1} h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
                                 <Text style={{
                                   color: colors.silver,
                                   fontSize: 14,
@@ -447,8 +465,8 @@ class LaunchScreen extends Component {
                             alignItems: 'center',
                             alignContent: 'center',
                             height: 100,
-                            width: 200,
-                            marginHorizontal: 10,
+                            width: 250,
+                            marginHorizontal: 2,
                             borderRadius: 12,
                             borderWidth: 2,
                             borderColor: colors.silver,
@@ -464,12 +482,13 @@ class LaunchScreen extends Component {
                               alignItems: 'center',
                               alignContent: 'center',
                             }}>
-                              <SvgUri
-                                style={{ paddingRight: 5, flex: 0.5, alignItems: 'center'}}
-                                width={40}
-                                height={40}
-                                source={{ uri: item.item.iconUrl }}
-                              />
+                              <View style={{flex: 0.5, alignItems: 'center'}}>
+                                { item.item.iconUrl !== null && <Image
+                                  source={{ uri: item.item.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+                                  style={{ width: 50, height: 50, resizeMode: 'contain' }}
+                                  PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+                                /> }
+                              </View>
                               <View style={{
                                 flexDirection: 'column',
                                 justifyContent: 'space-around',
@@ -477,7 +496,7 @@ class LaunchScreen extends Component {
                                 alignContent: 'center',
                                 flex: 0.5
                               }}>
-                                <Text h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
+                                <Text numberOfLines={1} h4 h4Style={{ color: colors.silver, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>{item.item.name}</Text>
                                 <Text style={{
                                   color: colors.silver,
                                   fontSize: 14,
@@ -514,12 +533,13 @@ class LaunchScreen extends Component {
 const svgBloack = (data) => {
   return (
     <View style={{ paddingTop: 10, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-      <SvgUri
-        style={{ flex: 0.5, alignItems: 'center' }}
-        width={60}
-        height={60}
-        source={{ uri: data.iconUrl }}
-      />
+      <View style={{flex: 0.5, alignItems: 'center'}}>
+        { data.iconUrl !== null  && <Image
+          source={{ uri: data.iconUrl.replace(/\.(svg)($|\?)/, '.png$2') }}
+          style={{ width: 60, height: 60, resizeMode: 'contain' }}
+          PlaceholderContent={<ActivityIndicator style={{ backgroundColor: colors.transparent }}/>}
+        />}
+      </View>
       <Text h4 h4Style={{ fontWeight: 'bold', color: colors.silver, flex: 0.5, textAlign: 'center' }}>{data.name}</Text>
     </View>
   )
